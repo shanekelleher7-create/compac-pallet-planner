@@ -1,0 +1,1446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Compac Industries — Pallet Optimizer</title>
+<style>
+  :root {
+    --navy: #1E3A5F;
+    --navy-light: #2A4F7F;
+    --navy-dark: #142840;
+    --amber: #F59E0B;
+    --amber-light: #FCD34D;
+    --amber-dark: #D97706;
+    --input-bg: #FFFDE7;
+    --input-border: #F59E0B;
+    --green: #10B981;
+    --red: #EF4444;
+    --orange: #F97316;
+    --gray-50: #F9FAFB;
+    --gray-100: #F3F4F6;
+    --gray-200: #E5E7EB;
+    --gray-300: #D1D5DB;
+    --gray-500: #6B7280;
+    --gray-700: #374151;
+    --gray-900: #111827;
+    --card-shadow: 0 2px 8px rgba(0,0,0,0.10);
+    --radius: 8px;
+    --radius-sm: 4px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background: #EEF2F7;
+    color: var(--gray-900);
+    font-size: 14px;
+    line-height: 1.5;
+  }
+
+  /* HEADER */
+  .site-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  }
+  .site-header .logo {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .site-header .logo-icon {
+    width: 36px; height: 36px;
+    background: var(--amber);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    font-weight: 900; font-size: 18px; color: var(--navy);
+  }
+  .site-header h1 {
+    font-size: 20px; font-weight: 700; letter-spacing: -0.3px;
+  }
+  .site-header .subtitle {
+    font-size: 11px; color: #94B4D1; margin-top: 1px;
+  }
+  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .btn {
+    padding: 7px 16px; border-radius: var(--radius-sm); border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+  }
+  .btn-primary { background: var(--amber); color: var(--navy); }
+  .btn-primary:hover { background: var(--amber-dark); }
+  .btn-secondary { background: rgba(255,255,255,0.15); color: #fff; border: 1px solid rgba(255,255,255,0.3); }
+  .btn-secondary:hover { background: rgba(255,255,255,0.25); }
+  .btn-danger { background: #FEE2E2; color: #B91C1C; }
+  .btn-danger:hover { background: #FECACA; }
+  .btn-ghost { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
+  .btn-ghost:hover { background: var(--gray-200); }
+  .btn-sm { padding: 4px 10px; font-size: 12px; }
+
+  /* MAIN LAYOUT */
+  .main { max-width: 1600px; margin: 0 auto; padding: 20px 20px 40px; }
+
+  /* STATS BAR */
+  .stats-bar {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+  .stat-card {
+    background: #fff;
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    box-shadow: var(--card-shadow);
+    border-left: 4px solid var(--navy);
+  }
+  .stat-card.warn { border-left-color: var(--red); }
+  .stat-card .stat-label { font-size: 11px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-card .stat-value { font-size: 26px; font-weight: 700; color: var(--navy); line-height: 1.2; }
+  .stat-card.warn .stat-value { color: var(--red); }
+
+  /* SECTION CARDS */
+  .section-card {
+    background: #fff;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+  }
+  .section-header {
+    background: var(--navy);
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: var(--radius) var(--radius) 0 0;
+    display: flex; align-items: center; justify-content: space-between;
+    cursor: pointer; user-select: none;
+  }
+  .section-header h2 { font-size: 14px; font-weight: 700; letter-spacing: 0.3px; }
+  .section-header .toggle-icon { font-size: 18px; transition: transform 0.2s; }
+  .section-header.collapsed .toggle-icon { transform: rotate(-90deg); }
+  .section-body { padding: 20px; }
+  .section-body.hidden { display: none; }
+
+  /* SETTINGS PANEL */
+  .settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+  }
+  .field-group label { display: block; font-size: 11px; color: var(--gray-500); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
+  .field-group input, .field-group select {
+    width: 100%; padding: 7px 10px;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+    font-size: 13px; background: var(--input-bg);
+    color: var(--gray-900); outline: none;
+    transition: border-color 0.15s;
+  }
+  .field-group input:focus, .field-group select:focus { border-color: var(--amber); }
+
+  /* SKU TABLE */
+  .sku-table-wrap { overflow-x: auto; }
+  table.sku-table {
+    width: 100%; border-collapse: collapse; min-width: 900px;
+  }
+  .sku-table th {
+    background: var(--navy); color: #fff;
+    padding: 9px 10px; text-align: left; font-size: 11px; font-weight: 700;
+    letter-spacing: 0.4px; white-space: nowrap;
+  }
+  .sku-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
+  .sku-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
+  .sku-table td { padding: 6px 8px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  .sku-table tr:last-child td { border-bottom: none; }
+  .sku-table tr:hover td { background: #F0F7FF; }
+  .sku-table input[type="text"], .sku-table input[type="number"] {
+    width: 100%; padding: 5px 8px;
+    border: 1.5px solid var(--input-border); border-radius: var(--radius-sm);
+    background: var(--input-bg); font-size: 13px; color: var(--gray-900);
+    outline: none; transition: border-color 0.15s;
+  }
+  .sku-table input:focus { border-color: var(--amber-dark); box-shadow: 0 0 0 2px rgba(245,158,11,0.2); }
+  .sku-table .col-sku { min-width: 90px; }
+  .sku-table .col-desc { min-width: 130px; }
+  .sku-table .col-num { min-width: 72px; }
+  .sku-table .col-action { min-width: 40px; text-align: center; }
+  .row-num { font-size: 11px; color: var(--gray-500); font-weight: 700; text-align: center; }
+
+  .table-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
+
+  /* STATUS MESSAGE */
+  .status-msg {
+    padding: 10px 16px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 600;
+    display: none; margin-bottom: 16px;
+  }
+  .status-msg.success { background: #D1FAE5; color: #065F46; border: 1px solid #6EE7B7; display: block; }
+  .status-msg.error   { background: #FEE2E2; color: #991B1B; border: 1px solid #FCA5A5; display: block; }
+  .status-msg.warning { background: #FEF3C7; color: #92400E; border: 1px solid #FCD34D; display: block; }
+
+  /* SKU SUMMARY TABLE */
+  table.summary-table { width: 100%; border-collapse: collapse; }
+  .summary-table th {
+    background: var(--navy); color: #fff; padding: 8px 12px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-align: left;
+  }
+  .summary-table td { padding: 7px 12px; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
+  .summary-table tr:last-child td { border-bottom: none; }
+  .summary-table tr:hover td { background: #F0F7FF; }
+  .summary-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .sku-color-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 6px; vertical-align: middle; }
+
+  /* PALLET GRID */
+  .pallet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+  /* PALLET CARD */
+  .pallet-card {
+    background: #fff; border-radius: var(--radius);
+    box-shadow: var(--card-shadow); overflow: hidden;
+    border: 1px solid var(--gray-200);
+  }
+  .pallet-card-header {
+    background: var(--navy); color: #fff;
+    padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .pallet-card-header .pallet-num { font-size: 15px; font-weight: 800; }
+  .pallet-card-header .pallet-ht { font-size: 12px; color: #94B4D1; }
+  .pallet-card-header .pallet-ht.over { color: #FCA5A5; font-weight: 700; }
+  .warn-badge {
+    background: var(--red); color: #fff; font-size: 10px; font-weight: 700;
+    padding: 2px 7px; border-radius: 20px;
+  }
+
+  .pallet-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; background: var(--gray-200); }
+  .pallet-stat { background: #fff; padding: 10px 14px; }
+  .pallet-stat .ps-label { font-size: 10px; color: var(--gray-500); text-transform: uppercase; letter-spacing: 0.4px; }
+  .pallet-stat .ps-value { font-size: 18px; font-weight: 700; color: var(--navy); }
+  .pallet-stat .ps-unit { font-size: 10px; color: var(--gray-500); }
+
+  .freight-row {
+    background: var(--amber); padding: 8px 14px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .freight-row .fc-label { font-size: 11px; font-weight: 700; color: var(--navy); }
+  .freight-row .fc-value { font-size: 20px; font-weight: 900; color: var(--navy); }
+
+  .layer-table-wrap { max-height: 160px; overflow-y: auto; }
+  table.layer-table { width: 100%; border-collapse: collapse; }
+  .layer-table th { background: var(--gray-100); font-size: 10px; color: var(--gray-500); padding: 5px 10px; text-align: left; position: sticky; top: 0; }
+  .layer-table td { padding: 4px 10px; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
+  .layer-table tr:last-child td { border-bottom: none; }
+  .layer-sku-chip {
+    display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 700;
+    color: #fff; margin-right: 3px; margin-bottom: 2px;
+  }
+
+  .pallet-viz { padding: 12px 14px; background: var(--gray-50); border-top: 1px solid var(--gray-200); }
+  .pallet-viz svg { display: block; margin: 0 auto; }
+
+  /* COLOR LEGEND */
+  .legend-wrap { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 20px; }
+  .legend-item { display: flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 600; color: var(--gray-700); }
+  .legend-swatch { width: 18px; height: 18px; border-radius: 4px; }
+
+  /* FINANCIALS */
+  .financials-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+  .fin-block h3 { font-size: 13px; font-weight: 700; color: var(--navy); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.4px; border-bottom: 2px solid var(--amber); padding-bottom: 4px; }
+  .fin-row { display: flex; justify-content: space-between; padding: 6px 0; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
+  .fin-row:last-child { border-bottom: none; }
+  .fin-row.total { font-weight: 700; font-size: 15px; color: var(--navy); padding-top: 10px; }
+  .fin-row.positive .fin-val { color: var(--green); font-weight: 700; }
+  .fin-row.negative .fin-val { color: var(--red); }
+  .fin-label { color: var(--gray-700); }
+  .fin-val { font-variant-numeric: tabular-nums; }
+  .margin-badge {
+    display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;
+    margin-left: 8px;
+  }
+  .margin-badge.good { background: #D1FAE5; color: #065F46; }
+  .margin-badge.ok { background: #FEF3C7; color: #92400E; }
+  .margin-badge.bad { background: #FEE2E2; color: #991B1B; }
+
+  /* CARRIER TABLE */
+  table.carrier-table { width: 100%; border-collapse: collapse; }
+  .carrier-table th {
+    background: var(--navy); color: #fff; padding: 8px 12px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-align: left;
+  }
+  .carrier-table td { padding: 7px 10px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  .carrier-table tr:last-child td { border-bottom: none; }
+  .carrier-table input, .carrier-table select {
+    width: 100%; padding: 5px 8px;
+    border: 1.5px solid var(--input-border); border-radius: var(--radius-sm);
+    background: var(--input-bg); font-size: 13px; outline: none;
+  }
+  .carrier-table input:focus, .carrier-table select:focus { border-color: var(--amber-dark); }
+  .carrier-table .best-row td { background: #D1FAE5; }
+  .carrier-table .best-row td:first-child { border-left: 4px solid var(--green); }
+  .carrier-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
+  .carrier-name { font-weight: 700; color: var(--navy); }
+  .best-badge {
+    display: inline-block; background: var(--green); color: #fff;
+    font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 20px; margin-left: 5px;
+  }
+
+  /* RESPONSIVE */
+  @media (max-width: 900px) {
+    .stats-bar { grid-template-columns: repeat(3, 1fr); }
+    .financials-grid { grid-template-columns: 1fr; }
+  }
+  @media (max-width: 600px) {
+    .stats-bar { grid-template-columns: 1fr 1fr; }
+    .header-actions .btn:not(.btn-primary) { display: none; }
+  }
+
+  /* PRINT */
+  @media print {
+    body { background: #fff; font-size: 12px; }
+    .site-header { position: static; }
+    .header-actions { display: none; }
+    .section-body.hidden { display: block !important; }
+    .btn { display: none; }
+    .pallet-grid { grid-template-columns: repeat(3, 1fr); }
+  }
+
+  /* MISC */
+  .divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-500); }
+  .empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
+  .empty-state p { font-size: 14px; }
+  .text-right { text-align: right; }
+  .text-muted { color: var(--gray-500); }
+  .fw-bold { font-weight: 700; }
+  .mt-8 { margin-top: 8px; }
+  .mt-16 { margin-top: 16px; }
+  .no-results { padding: 30px; text-align: center; color: var(--gray-500); font-size: 13px; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="site-header">
+  <div class="logo">
+    <div class="logo-icon">CI</div>
+    <div>
+      <div class="site-header h1" style="font-size:18px;font-weight:800;color:#fff;">Compac Industries</div>
+      <div class="subtitle">Amazon FBA Pallet Optimizer</div>
+    </div>
+  </div>
+  <div class="header-actions">
+    <button class="btn btn-secondary btn-sm" onclick="openImportModal()">&#128203; Paste Import</button>
+    <button class="btn btn-secondary btn-sm" onclick="loadSampleData()">&#9654; Sample Data</button>
+    <button class="btn btn-secondary btn-sm" onclick="clearAll()">&#10005; Clear</button>
+    <button class="btn btn-secondary btn-sm" onclick="window.print()">&#128438; Print</button>
+    <button class="btn btn-primary" onclick="runOptimizer()">&#9654;&#9654; Optimize Pallets</button>
+  </div>
+</header>
+
+<div class="main">
+
+  <!-- STATUS MESSAGE -->
+  <div class="status-msg" id="statusMsg"></div>
+
+  <!-- STATS BAR -->
+  <div class="stats-bar" id="statsBar">
+    <div class="stat-card">
+      <div class="stat-label">Total Pallets</div>
+      <div class="stat-value" id="st-pallets">—</div>
+    </div>
+    <div class="stat-card warn" id="st-card-warn">
+      <div class="stat-label">Height Violations</div>
+      <div class="stat-value" id="st-warnings">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Weight</div>
+      <div class="stat-value" id="st-weight">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Total Volume</div>
+      <div class="stat-value" id="st-volume">—</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">SKUs</div>
+      <div class="stat-value" id="st-skus">—</div>
+    </div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="section-card">
+    <div class="section-header" onclick="toggleSection(this)">
+      <h2>&#9881; Pallet &amp; Fee Settings</h2>
+      <span class="toggle-icon">&#9660;</span>
+    </div>
+    <div class="section-body" id="settings-body">
+      <div class="settings-grid">
+        <div class="field-group">
+          <label>Pallet Length (in)</label>
+          <input type="number" id="palletL" value="40" min="1">
+        </div>
+        <div class="field-group">
+          <label>Pallet Width (in)</label>
+          <input type="number" id="palletW" value="48" min="1">
+        </div>
+        <div class="field-group">
+          <label>Max Height (in)</label>
+          <input type="number" id="maxHeight" value="72" min="1">
+        </div>
+        <div class="field-group">
+          <label>Pallet Board Height (in)</label>
+          <input type="number" id="palletBoardH" value="5" min="0" step="0.5">
+        </div>
+        <div class="field-group">
+          <label>Empty Pallet Weight (lbs)</label>
+          <input type="number" id="palletWeight" value="50" min="0">
+        </div>
+        <div class="field-group">
+          <label>Amazon Referral Fee %</label>
+          <input type="number" id="referralFee" value="15" min="0" max="100" step="0.1">
+        </div>
+        <div class="field-group">
+          <label>Amazon FBA Fee %</label>
+          <input type="number" id="fbaFee" value="25" min="0" max="100" step="0.1">
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SKU INPUT -->
+  <div class="section-card">
+    <div class="section-header" onclick="toggleSection(this)">
+      <h2>&#128230; SKU / Product Entry</h2>
+      <span class="toggle-icon">&#9660;</span>
+    </div>
+    <div class="section-body">
+      <div class="sku-table-wrap">
+        <table class="sku-table" id="skuTable">
+          <thead>
+            <tr>
+              <th style="width:30px">#</th>
+              <th class="col-sku">SKU Code</th>
+              <th class="col-desc">Description</th>
+              <th class="col-num">Box L (in)</th>
+              <th class="col-num">Box W (in)</th>
+              <th class="col-num">Box H (in)</th>
+              <th class="col-num">Weight (lbs)</th>
+              <th class="col-num">Qty (ctns)</th>
+              <th class="col-num">Sell Price ($)</th>
+              <th class="col-num">Unit Cost ($)</th>
+              <th class="col-num">Units/Box</th>
+              <th class="col-action">Del</th>
+            </tr>
+          </thead>
+          <tbody id="skuTbody"></tbody>
+        </table>
+      </div>
+      <div class="table-actions">
+        <button class="btn btn-ghost btn-sm" onclick="addSKURow()">&#43; Add SKU Row</button>
+        <span class="text-muted" style="font-size:12px;">Yellow cells = required inputs</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- RESULTS: SKU SUMMARY -->
+  <div class="section-card" id="skuSummarySection" style="display:none;">
+    <div class="section-header" onclick="toggleSection(this)">
+      <h2>&#128203; SKU Summary</h2>
+      <span class="toggle-icon">&#9660;</span>
+    </div>
+    <div class="section-body" style="padding:0;">
+      <div id="skuSummaryWrap"></div>
+    </div>
+  </div>
+
+  <!-- RESULTS: PALLETS -->
+  <div class="section-card" id="palletResultsSection" style="display:none;">
+    <div class="section-header" onclick="toggleSection(this)">
+      <h2>&#128230; Pallet Results</h2>
+      <span class="toggle-icon">&#9660;</span>
+    </div>
+    <div class="section-body">
+      <div class="pallet-grid" id="palletGrid"></div>
+      <div class="divider"></div>
+      <div id="skuLegend" class="legend-wrap"></div>
+    </div>
+  </div>
+
+  <!-- FINANCIALS -->
+  <div class="section-card" id="financialsSection" style="display:none;">
+    <div class="section-header" onclick="toggleSection(this)">
+      <h2>&#128200; Shipment Financial Summary</h2>
+      <span class="toggle-icon">&#9660;</span>
+    </div>
+    <div class="section-body">
+      <div id="financialsWrap"></div>
+    </div>
+  </div>
+
+  <!-- CARRIER RATES -->
+  <div class="section-card">
+    <div class="section-header" onclick="toggleSection(this)">
+      <h2>&#128666; Carrier Rate Comparison</h2>
+      <span class="toggle-icon">&#9660;</span>
+    </div>
+    <div class="section-body" style="padding:0;">
+      <div style="overflow-x:auto;">
+        <table class="carrier-table" id="carrierTable">
+          <thead>
+            <tr>
+              <th>Carrier</th>
+              <th>Rate Type</th>
+              <th>Base Rate</th>
+              <th>Fuel Surcharge %</th>
+              <th class="num">Total Cost</th>
+              <th class="num">Per Pallet</th>
+            </tr>
+          </thead>
+          <tbody id="carrierTbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+
+<script>
+// ─────────────────────────────────────────────────────────────────────
+// CONSTANTS & STATE
+// ─────────────────────────────────────────────────────────────────────
+const CARRIERS = ['Averitt', 'SAIA', 'TFIN (TForce)', 'Estes Express', 'Amazon CTII'];
+const SKU_COLORS = [
+  '#3B82F6','#10B981','#F59E0B','#EF4444','#8B5CF6',
+  '#EC4899','#06B6D4','#84CC16','#F97316','#6366F1'
+];
+
+let skuRowCount = 0;
+let lastResult = null;
+
+// ─────────────────────────────────────────────────────────────────────
+// INITIALIZATION
+// ─────────────────────────────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  for (let i = 0; i < 3; i++) addSKURow();
+  renderCarrierTable();
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// SKU TABLE MANAGEMENT
+// ─────────────────────────────────────────────────────────────────────
+function addSKURow(data) {
+  skuRowCount++;
+  const tbody = document.getElementById('skuTbody');
+  const tr = document.createElement('tr');
+  tr.dataset.rowId = skuRowCount;
+  const d = data || {};
+  tr.innerHTML = `
+    <td class="row-num">${tbody.children.length + 1}</td>
+    <td><input type="text" class="col-sku" placeholder="SKU-001" value="${d.sku||''}"></td>
+    <td><input type="text" class="col-desc" placeholder="Product name" value="${d.desc||''}"></td>
+    <td><input type="number" class="col-num" placeholder="14" min="1" step="0.1" value="${d.l||''}"></td>
+    <td><input type="number" class="col-num" placeholder="10" min="1" step="0.1" value="${d.w||''}"></td>
+    <td><input type="number" class="col-num" placeholder="8"  min="1" step="0.1" value="${d.h||''}"></td>
+    <td><input type="number" class="col-num" placeholder="25" min="0" step="0.1" value="${d.wt||''}"></td>
+    <td><input type="number" class="col-num" placeholder="100" min="1" value="${d.qty||''}"></td>
+    <td><input type="number" class="col-num" placeholder="29.99" min="0" step="0.01" value="${d.sell||''}"></td>
+    <td><input type="number" class="col-num" placeholder="8.50" min="0" step="0.01" value="${d.cost||''}"></td>
+    <td><input type="number" class="col-num" placeholder="12" min="1" value="${d.units||''}"></td>
+    <td class="col-action"><button class="btn btn-danger btn-sm" onclick="removeSKURow(this)" title="Remove row">&#10005;</button></td>
+  `;
+  tbody.appendChild(tr);
+  renumberRows();
+}
+
+function removeSKURow(btn) {
+  btn.closest('tr').remove();
+  renumberRows();
+}
+
+function renumberRows() {
+  document.querySelectorAll('#skuTbody tr').forEach((tr, i) => {
+    tr.querySelector('.row-num').textContent = i + 1;
+  });
+}
+
+function getSKUData() {
+  const rows = [];
+  document.querySelectorAll('#skuTbody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    const sku  = inputs[0].value.trim();
+    const desc = inputs[1].value.trim();
+    const l    = parseFloat(inputs[2].value);
+    const w    = parseFloat(inputs[3].value);
+    const h    = parseFloat(inputs[4].value);
+    const wt   = parseFloat(inputs[5].value);
+    const qty  = parseFloat(inputs[6].value);
+    const sell = parseFloat(inputs[7].value);
+    const cost = parseFloat(inputs[8].value);
+    const units= parseFloat(inputs[9].value);
+    if (!sku || isNaN(l) || isNaN(w) || isNaN(h) || isNaN(wt) || isNaN(qty)) return;
+    rows.push({ sku, desc: desc||sku, l, w, h, wt, qty: Math.round(qty), sell: sell||0, cost: cost||0, units: units||1 });
+  });
+  return rows;
+}
+
+function getSettings() {
+  return {
+    palletL:       parseFloat(document.getElementById('palletL').value)       || 40,
+    palletW:       parseFloat(document.getElementById('palletW').value)       || 48,
+    maxHeight:     parseFloat(document.getElementById('maxHeight').value)     || 72,
+    palletBoardH:  parseFloat(document.getElementById('palletBoardH').value)  || 5,
+    palletWeight:  parseFloat(document.getElementById('palletWeight').value)  || 50,
+    referralFee:  parseFloat(document.getElementById('referralFee').value)  || 15,
+    fbaFee:       parseFloat(document.getElementById('fbaFee').value)       || 25,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// CORE ALGORITHM FUNCTIONS
+// ─────────────────────────────────────────────────────────────────────
+
+/**
+ * Compute boxes per layer for a SKU on a pallet.
+ * Tries both L/W orientations and returns the max.
+ */
+function computeBoxesPerLayer(boxL, boxW, palletL, palletW) {
+  const o1 = Math.floor(palletL / boxL) * Math.floor(palletW / boxW);
+  const o2 = Math.floor(palletL / boxW) * Math.floor(palletW / boxL);
+  return Math.max(o1, o2);
+}
+
+/**
+ * NMFC freight class lookup by density (lbs/cu ft)
+ */
+function getFreightClass(density) {
+  if (density >= 35)  return '55';
+  if (density >= 30)  return '60';
+  if (density >= 22.5)return '65';
+  if (density >= 15)  return '70';
+  if (density >= 12)  return '85';
+  if (density >= 10)  return '92.5';
+  if (density >= 8)   return '100';
+  if (density >= 6)   return '125';
+  if (density >= 4)   return '175';
+  if (density >= 2)   return '250';
+  if (density >= 1)   return '300';
+  return '400';
+}
+
+/**
+ * Main optimizer. Returns array of pallet objects.
+ * Each pallet: { layers: [{skuIdx, sku, count, heightIn, color}], totalHeight, totalWeight }
+ */
+function optimizePallets(skus, settings) {
+  const { palletL, palletW, maxHeight, palletBoardH, palletWeight } = settings;
+  const stackLimit = maxHeight - palletBoardH; // usable height for boxes
+  const ITER_LIMIT = 100000;
+
+  // Precompute per-SKU data
+  const skuData = skus.map((s, i) => ({
+    ...s,
+    idx: i,
+    color: SKU_COLORS[i % SKU_COLORS.length],
+    bpl: computeBoxesPerLayer(s.l, s.w, palletL, palletW), // boxes per layer
+    remaining: s.qty,
+  }));
+
+  // Warn about oversized
+  const oversized = skuData.filter(s => s.bpl === 0);
+
+  const pallets = [];
+  let iter = 0;
+
+  while (skuData.some(s => s.remaining > 0) && iter < ITER_LIMIT) {
+    iter++;
+    const pallet = { layers: [], totalWeight: palletWeight };
+    let palletHeight = 0;
+
+    let innerIter = 0;
+    while (innerIter < ITER_LIMIT) {
+      innerIter++;
+      // Find best primary SKU: most remaining that can fit at least 1 box and won't exceed height
+      const candidates = skuData.filter(s =>
+        s.remaining > 0 &&
+        s.bpl > 0 &&
+        palletHeight + s.h <= stackLimit
+      );
+      if (candidates.length === 0) break;
+
+      // Prefer SKUs that can complete a full layer, else take partial
+      const canComplete = candidates.filter(s => s.remaining >= s.bpl);
+      const pool = canComplete.length > 0 ? canComplete : candidates;
+
+      // FIX 1 — Prefer SKUs whose next layer still leaves room for different-height SKUs.
+      // This prevents a tall SKU from greedily filling the pallet (e.g. 6 × 10.5" = 63",
+      // leaving only 4" — too small for any other box) when keeping 1 layer of height
+      // available would allow mixing shorter-height boxes on the same pallet.
+      const openPool = pool.filter(s => {
+        const afterOneLayer = palletHeight + s.h;
+        return skuData.some(o =>
+          o !== s && o.remaining > 0 && o.bpl > 0 &&
+          o.h !== s.h && afterOneLayer + o.h <= stackLimit
+        );
+      });
+      // Fall back to full pool only if no SKU can keep the pallet "open"
+      const usingOpenPool = openPool.length > 0;
+      const finalPool = usingOpenPool ? openPool : pool;
+      finalPool.sort((a, b) => b.remaining - a.remaining);
+      const primary = finalPool[0];
+
+      // How many full layers of primary fit in the remaining height?
+      const layersAvail = Math.floor((stackLimit - palletHeight) / primary.h);
+      if (layersAvail === 0) break;
+
+      // FIX 2 — Cap layers placed so we always leave at least one layer of height
+      // available for different-height SKUs (when mixing is still possible).
+      // Guard: only reduce if the other-height SKU still has a FULL layer to place.
+      // If those SKUs are in "tail" territory (remaining < bpl), they'll fit as partials
+      // in whatever space is left and don't need a reserved layer — reducing here would
+      // only cause unnecessary overflow onto an extra pallet.
+      const otherDiffH = skuData.filter(s =>
+        s !== primary && s.remaining > 0 && s.bpl > 0 && s.h !== primary.h
+      );
+      let effectiveCap = layersAvail;
+      if (usingOpenPool && otherDiffH.length > 0) {
+        const minOtherH = Math.min(...otherDiffH.map(s => s.h));
+        const roomAfterAll = stackLimit - palletHeight - layersAvail * primary.h;
+        const otherHasFull = otherDiffH.some(s => s.remaining >= s.bpl); // has ≥1 full layer
+        if (roomAfterAll < minOtherH && otherHasFull) {
+          effectiveCap = layersAvail - 1; // give up 1 layer to keep mixing door open
+        }
+      }
+
+      // Full layers to place (capped)
+      let fullLayers = Math.min(Math.floor(primary.remaining / primary.bpl), effectiveCap);
+
+      let boxesPlaced = 0; // track progress to detect stalls
+
+      if (fullLayers > 0) {
+        const boxesUsed = fullLayers * primary.bpl;
+        pallet.layers.push({
+          skuIdx: primary.idx,
+          sku: primary.sku,
+          desc: primary.desc,
+          count: boxesUsed,
+          heightIn: fullLayers * primary.h,
+          h: primary.h,
+          fullLayers,
+          color: primary.color,
+          segments: [{ skuIdx: primary.idx, sku: primary.sku, color: primary.color, count: boxesUsed, bpl: primary.bpl }]
+        });
+        pallet.totalWeight += boxesUsed * primary.wt;
+        primary.remaining -= boxesUsed;
+        palletHeight += fullLayers * primary.h;
+        boxesPlaced += boxesUsed;
+      }
+
+      // FIX 3 — Only run the partial-layer/filler logic when primary truly has a
+      // fractional layer left (remaining < bpl). Previously this also fired when
+      // remaining >= bpl (i.e. another full layer), which bypassed the effectiveCap
+      // limit and snuck an extra tall layer onto the pallet before mixing could happen.
+      //
+      // FIX 4 — Also skip the partial layer if placing it would seal the pallet height
+      // such that no different-height SKU can follow. This mirrors the effectiveCap
+      // logic applied to full layers above, and prevents e.g. a 3-box 71302 tail from
+      // pushing pallet height to 63" (4" remaining) when 5.5" misc boxes are waiting.
+      const otherDiffHPartial = skuData.filter(s =>
+        s !== primary && s.remaining > 0 && s.bpl > 0 && s.h !== primary.h
+      );
+      const partialWouldCloseOff = otherDiffHPartial.length > 0 &&
+        stackLimit - (palletHeight + primary.h) < Math.min(...otherDiffHPartial.map(s => s.h));
+
+      if (primary.remaining > 0 && primary.remaining < primary.bpl &&
+          palletHeight + primary.h <= stackLimit && !partialWouldCloseOff) {
+        const layerH = primary.h;
+        let placedPrimary = primary.remaining; // all remaining (< 1 full layer)
+        let usedArea = placedPrimary * primary.l * primary.w;
+        const totalArea = palletL * palletW;
+        const segments = [];
+
+        segments.push({ skuIdx: primary.idx, sku: primary.sku, color: primary.color, count: placedPrimary, bpl: primary.bpl });
+        primary.remaining -= placedPrimary;
+        pallet.totalWeight += placedPrimary * primary.wt;
+        boxesPlaced += placedPrimary;
+
+        // Fill remaining footprint area with same-height SKUs
+        const fillers = skuData.filter(s =>
+          s.remaining > 0 && s.bpl > 0 && s.h === layerH && s.idx !== primary.idx
+        );
+        fillers.sort((a, b) => b.remaining - a.remaining);
+
+        for (const filler of fillers) {
+          const remainingArea = totalArea - usedArea;
+          if (remainingArea <= 0) break;
+          const boxArea = filler.l * filler.w;
+          const maxFit = Math.floor(remainingArea / boxArea);
+          if (maxFit <= 0) continue;
+          const toPlace = Math.min(maxFit, filler.remaining);
+          if (toPlace <= 0) continue;
+          segments.push({ skuIdx: filler.idx, sku: filler.sku, color: filler.color, count: toPlace, bpl: filler.bpl });
+          filler.remaining -= toPlace;
+          pallet.totalWeight += toPlace * filler.wt;
+          usedArea += toPlace * boxArea;
+          boxesPlaced += toPlace;
+        }
+
+        const totalBoxes = segments.reduce((s, x) => s + x.count, 0);
+        if (totalBoxes > 0) {
+          pallet.layers.push({
+            skuIdx: primary.idx,
+            sku: primary.sku,
+            desc: primary.desc,
+            count: totalBoxes,
+            heightIn: layerH,
+            h: layerH,
+            fullLayers: 1,
+            color: primary.color,
+            segments,
+            mixed: segments.length > 1
+          });
+          palletHeight += layerH;
+        }
+      }
+
+      // Safety: if nothing was placed this iteration, the pallet is done
+      if (boxesPlaced === 0) break;
+
+      // If primary is exhausted, loop continues to next SKU
+    }
+
+    if (pallet.layers.length > 0) {
+      pallet.totalHeight = pallet.layers.reduce((s, l) => s + l.heightIn, 0);
+      pallet.reportedHeight = pallet.totalHeight + palletBoardH; // total incl. pallet board
+      pallet.overHeight = pallet.reportedHeight > maxHeight;
+      pallets.push(pallet);
+    } else {
+      // Safety: if no layers placed but remaining > 0, break to avoid infinite loop
+      break;
+    }
+  }
+
+  // CONSOLIDATION PASS — After the greedy algorithm finishes, check whether the
+  // last pallet's boxes physically fit on top of the previous pallet. If they do,
+  // merge them. This catches cases where the greedy pass leaves a small "tail"
+  // pallet that could have been consolidated (e.g. AZUS26-008 pallet 5 → pallet 4).
+  // We loop so that multiple thin trailing pallets can roll up, but stop as soon as
+  // a merge would exceed the stack limit.
+  while (pallets.length > 1) {
+    const last = pallets[pallets.length - 1];
+    const prev = pallets[pallets.length - 2];
+    if (prev.totalHeight + last.totalHeight <= stackLimit) {
+      prev.layers = prev.layers.concat(last.layers);
+      prev.totalHeight += last.totalHeight;
+      prev.reportedHeight = prev.totalHeight + palletBoardH;
+      prev.overHeight = prev.reportedHeight > maxHeight;
+      prev.totalWeight += last.totalWeight - palletWeight; // don't double-count pallet tare
+      pallets.pop();
+    } else {
+      break;
+    }
+  }
+
+  return { pallets, oversized, skuData };
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RENDER: STATS BAR
+// ─────────────────────────────────────────────────────────────────────
+function renderStatsBar(pallets, skus) {
+  const totalWeight = pallets.reduce((s, p) => s + p.totalWeight, 0);
+  const totalVolume = pallets.reduce((s, p) => {
+    const settings = getSettings();
+    return s + (settings.palletL * settings.palletW * p.totalHeight / 1728);
+  }, 0);
+  const warnings = pallets.filter(p => p.overHeight).length;
+
+  document.getElementById('st-pallets').textContent = pallets.length;
+  document.getElementById('st-warnings').textContent = warnings;
+  document.getElementById('st-weight').textContent = fmtNum(totalWeight, 0) + ' lbs';
+  document.getElementById('st-volume').textContent = fmtNum(totalVolume, 1) + ' ft³';
+  document.getElementById('st-skus').textContent = skus.length;
+
+  const warnCard = document.getElementById('st-card-warn');
+  warnCard.style.borderLeftColor = warnings > 0 ? 'var(--red)' : 'var(--green)';
+  document.getElementById('st-warnings').style.color = warnings > 0 ? 'var(--red)' : 'var(--green)';
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RENDER: SKU SUMMARY TABLE
+// ─────────────────────────────────────────────────────────────────────
+function renderSKUSummary(skus, settings, pallets) {
+  const wrap = document.getElementById('skuSummaryWrap');
+  let html = `<div style="overflow-x:auto;"><table class="summary-table">
+    <thead><tr>
+      <th>Color</th><th>SKU</th><th>Description</th>
+      <th class="num">L×W×H (in)</th>
+      <th class="num">Boxes/Layer</th>
+      <th class="num">Qty (ctns)</th>
+      <th class="num">Sell Price</th>
+      <th class="num">Unit Cost</th>
+      <th class="num">Total Sell $</th>
+      <th class="num">Total COGS $</th>
+    </tr></thead><tbody>`;
+  skus.forEach((s, i) => {
+    const color = SKU_COLORS[i % SKU_COLORS.length];
+    const bpl = computeBoxesPerLayer(s.l, s.w, settings.palletL, settings.palletW);
+    const totalSell = s.qty * s.units * s.sell;
+    const totalCogs = s.qty * s.units * s.cost;
+    html += `<tr>
+      <td><span class="sku-color-dot" style="background:${color};"></span></td>
+      <td class="fw-bold">${esc(s.sku)}</td>
+      <td>${esc(s.desc)}</td>
+      <td class="num">${s.l}×${s.w}×${s.h}</td>
+      <td class="num">${bpl > 0 ? bpl : '<span style="color:var(--red)">⚠ Oversized</span>'}</td>
+      <td class="num">${s.qty}</td>
+      <td class="num">$${fmtNum(s.sell,2)}</td>
+      <td class="num">$${fmtNum(s.cost,2)}</td>
+      <td class="num">$${fmtNum(totalSell,2)}</td>
+      <td class="num">$${fmtNum(totalCogs,2)}</td>
+    </tr>`;
+  });
+  html += '</tbody></table></div>';
+  wrap.innerHTML = html;
+  document.getElementById('skuSummarySection').style.display = '';
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RENDER: PALLET CARDS
+// ─────────────────────────────────────────────────────────────────────
+function renderPallets(pallets, settings, skus) {
+  const grid = document.getElementById('palletGrid');
+  grid.innerHTML = '';
+  pallets.forEach((p, i) => {
+    grid.appendChild(createPalletCard(p, i + 1, settings));
+  });
+
+  // Legend
+  const legend = document.getElementById('skuLegend');
+  legend.innerHTML = skus.map((s, i) =>
+    `<div class="legend-item">
+      <span class="legend-swatch" style="background:${SKU_COLORS[i % SKU_COLORS.length]};"></span>
+      <span>${esc(s.sku)}: ${esc(s.desc)}</span>
+    </div>`
+  ).join('');
+
+  document.getElementById('palletResultsSection').style.display = '';
+}
+
+function createPalletCard(pallet, num, settings) {
+  const card = document.createElement('div');
+  card.className = 'pallet-card';
+
+  const vol = settings.palletL * settings.palletW * pallet.totalHeight / 1728;
+  const density = vol > 0 ? pallet.totalWeight / vol : 0;
+  const fc = getFreightClass(density);
+  const overH = pallet.overHeight;
+  const reportedH = pallet.reportedHeight; // boxes + pallet board
+
+  // Header
+  let headerHTML = `<div class="pallet-card-header">
+    <div>
+      <div class="pallet-num">Pallet ${num}</div>
+      <div class="pallet-ht ${overH ? 'over' : ''}">${fmtNum(reportedH,1)}" total (${fmtNum(pallet.totalHeight,1)}" boxes + ${settings.palletBoardH}" board) / ${settings.maxHeight}"</div>
+    </div>
+    <div>${overH ? '<span class="warn-badge">&#9888; HEIGHT</span>' : '<span style="font-size:18px;">&#10003;</span>'}</div>
+  </div>`;
+
+  // Stats 2×2
+  let statsHTML = `<div class="pallet-stats">
+    <div class="pallet-stat">
+      <div class="ps-label">Height</div>
+      <div class="ps-value" style="color:${overH?'var(--red)':'var(--navy)'};">${fmtNum(pallet.totalHeight,1)}</div>
+      <div class="ps-unit">inches</div>
+    </div>
+    <div class="pallet-stat">
+      <div class="ps-label">Weight</div>
+      <div class="ps-value">${fmtNum(pallet.totalWeight,0)}</div>
+      <div class="ps-unit">lbs</div>
+    </div>
+    <div class="pallet-stat">
+      <div class="ps-label">Volume</div>
+      <div class="ps-value">${fmtNum(vol,2)}</div>
+      <div class="ps-unit">cu ft</div>
+    </div>
+    <div class="pallet-stat">
+      <div class="ps-label">Density</div>
+      <div class="ps-value">${fmtNum(density,2)}</div>
+      <div class="ps-unit">lbs/cu ft</div>
+    </div>
+  </div>`;
+
+  // Freight class
+  let freightHTML = `<div class="freight-row">
+    <span class="fc-label">NMFC FREIGHT CLASS</span>
+    <span class="fc-value">${fc}</span>
+  </div>`;
+
+  // Layer table
+  let layerRows = '';
+  pallet.layers.forEach((layer, li) => {
+    const chips = layer.segments
+      ? layer.segments.map(seg =>
+          `<span class="layer-sku-chip" style="background:${seg.color};">${esc(seg.sku)} ×${seg.count}</span>`
+        ).join('')
+      : `<span class="layer-sku-chip" style="background:${layer.color};">${esc(layer.sku)} ×${layer.count}</span>`;
+    layerRows += `<tr>
+      <td style="color:var(--gray-500);font-size:11px;">L${li+1}</td>
+      <td style="font-size:11px;">${fmtNum(layer.heightIn,1)}"</td>
+      <td>${chips}</td>
+    </tr>`;
+  });
+  let layerTableHTML = `<div class="layer-table-wrap">
+    <table class="layer-table">
+      <thead><tr><th>Lyr</th><th>Ht</th><th>Contents</th></tr></thead>
+      <tbody>${layerRows}</tbody>
+    </table>
+  </div>`;
+
+  // SVG viz
+  let vizHTML = `<div class="pallet-viz">${createPalletViz(pallet, settings)}</div>`;
+
+  card.innerHTML = headerHTML + statsHTML + freightHTML + layerTableHTML + vizHTML;
+  return card;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// SVG PALLET VISUALIZATION
+// ─────────────────────────────────────────────────────────────────────
+function createPalletViz(pallet, settings) {
+  const W = 220, H = 200;
+  const vizW = 160, vizH = 160;
+  const vizX = 20, vizY = 12;
+  const stackLimit = settings.maxHeight - settings.palletBoardH;
+  const scale = vizH / settings.maxHeight; // px per inch (total height incl. board)
+  const maxH = settings.maxHeight;
+  const overH = pallet.overHeight;
+  const boardPx = settings.palletBoardH * scale; // pallet board height in pixels
+
+  let svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
+
+  // Background
+  svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="#F9FAFB" rx="4"/>`;
+
+  // Draw layers from bottom up — boxes sit above the pallet board
+  let yBottom = vizY + vizH - boardPx; // top of board = bottom of box stacking area
+  const totalStackedH = pallet.totalHeight * scale;
+
+  pallet.layers.forEach(layer => {
+    const layerPxH = layer.heightIn * scale;
+    const yTop = yBottom - layerPxH;
+
+    if (layer.segments && layer.segments.length > 1) {
+      // Mixed layer: split width proportionally by box count
+      const totalBoxes = layer.segments.reduce((s, sg) => s + sg.count, 0);
+      let xLeft = vizX;
+      layer.segments.forEach((seg, si) => {
+        const segW = Math.round((seg.count / totalBoxes) * vizW);
+        svg += `<rect x="${xLeft}" y="${yTop}" width="${segW}" height="${layerPxH}" fill="${seg.color}" opacity="0.88" stroke="#fff" stroke-width="0.5"/>`;
+        if (segW > 28) {
+          svg += `<text x="${xLeft + segW/2}" y="${yTop + layerPxH/2 + 4}" text-anchor="middle" font-size="9" fill="#fff" font-weight="700" clip-path="url(#cp${si})">${esc(seg.sku)}</text>`;
+        }
+        xLeft += segW;
+      });
+    } else {
+      svg += `<rect x="${vizX}" y="${yTop}" width="${vizW}" height="${layerPxH}" fill="${layer.color}" opacity="0.88" stroke="#fff" stroke-width="1"/>`;
+      if (layerPxH > 12) {
+        svg += `<text x="${vizX + vizW/2}" y="${yTop + layerPxH/2 + 4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">${esc(layer.sku)}</text>`;
+      }
+    }
+    yBottom = yTop;
+  });
+
+  // Outline for stacking area
+  svg += `<rect x="${vizX}" y="${vizY}" width="${vizW}" height="${vizH}" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="3,2"/>`;
+
+  // Dashed max-height line
+  const maxLineY = vizY; // top of vizH is maxHeight
+  const lineColor = overH ? '#EF4444' : '#10B981';
+  svg += `<line x1="${vizX}" y1="${maxLineY}" x2="${vizX + vizW}" y2="${maxLineY}" stroke="${lineColor}" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  svg += `<text x="${vizX + vizW + 3}" y="${maxLineY + 4}" font-size="8" fill="${lineColor}" font-weight="700">${maxH}"</text>`;
+
+  // Pallet board — drawn INSIDE the 72" viz zone at the bottom, represents the full 5"
+  const boardY = vizY + vizH - boardPx;
+  // Top deck plank
+  const deckH = Math.max(3, boardPx * 0.35);
+  svg += `<rect x="${vizX}" y="${boardY}" width="${vizW}" height="${deckH}" fill="#8B5E3C" rx="1"/>`;
+  // Plank lines on top deck
+  for (let px = vizX + vizW * 0.25; px < vizX + vizW; px += vizW * 0.25) {
+    svg += `<line x1="${px}" y1="${boardY}" x2="${px}" y2="${boardY + deckH}" stroke="#6B4423" stroke-width="0.75"/>`;
+  }
+  // Legs/blocks inside the 5" zone
+  const legH2 = boardPx - deckH;
+  const legW2 = vizW * 0.22;
+  const legPositions = [vizX, vizX + vizW / 2 - legW2 / 2, vizX + vizW - legW2];
+  legPositions.forEach(lx => {
+    svg += `<rect x="${lx}" y="${boardY + deckH}" width="${legW2}" height="${legH2}" fill="#6B4423" rx="1"/>`;
+  });
+  // Bottom deck plank
+  const bottomDeckH = Math.max(2, deckH * 0.75);
+  svg += `<rect x="${vizX}" y="${vizY + vizH - bottomDeckH}" width="${vizW}" height="${bottomDeckH}" fill="#8B5E3C" rx="1"/>`;
+  if (boardPx > 10) {
+    svg += `<text x="${vizX + vizW/2}" y="${boardY + boardPx/2 + 3}" text-anchor="middle" font-size="7" fill="#fff" font-weight="600">${settings.palletBoardH}" board</text>`;
+  }
+
+  // Height annotation on right (spans from top of boxes down to floor)
+  const annotX = vizX + vizW + 16;
+  if (totalStackedH > 0) {
+    const topY = vizY + vizH - boardPx - totalStackedH; // top of boxes (above board)
+    svg += `<line x1="${annotX}" y1="${topY}" x2="${annotX}" y2="${vizY + vizH}" stroke="#6B7280" stroke-width="1"/>`;
+    svg += `<line x1="${annotX - 3}" y1="${topY}" x2="${annotX + 3}" y2="${topY}" stroke="#6B7280" stroke-width="1"/>`;
+    svg += `<line x1="${annotX - 3}" y1="${vizY+vizH}" x2="${annotX + 3}" y2="${vizY+vizH}" stroke="#6B7280" stroke-width="1"/>`;
+    const midY = (topY + vizY + vizH) / 2;
+    svg += `<text x="${annotX + 6}" y="${midY + 4}" font-size="9" fill="${overH?'#EF4444':'#374151'}" font-weight="700">${fmtNum(pallet.reportedHeight,0)}"</text>`;
+  }
+
+  svg += '</svg>';
+  return svg;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RENDER: FINANCIALS
+// ─────────────────────────────────────────────────────────────────────
+function renderFinancials(skus, settings, pallets) {
+  const referral = settings.referralFee / 100;
+  const fba = settings.fbaFee / 100;
+
+  const totalSell = skus.reduce((s, x) => s + x.qty * x.units * x.sell, 0);
+  const amazonFees = totalSell * (referral + fba);
+  const totalCOGS = skus.reduce((s, x) => s + x.qty * x.units * x.cost, 0);
+  const netRevenue = totalSell - amazonFees - totalCOGS;
+  const margin = totalSell > 0 ? (netRevenue / totalSell) * 100 : 0;
+
+  const marginClass = margin >= 20 ? 'good' : margin >= 5 ? 'ok' : 'bad';
+  const marginLabel = `<span class="margin-badge ${marginClass}">${fmtNum(margin,1)}%</span>`;
+
+  const totalPallets = pallets.length;
+  const totalWeight = pallets.reduce((s, p) => s + p.totalWeight, 0);
+
+  const wrap = document.getElementById('financialsWrap');
+  wrap.innerHTML = `
+  <div class="financials-grid">
+    <div class="fin-block">
+      <h3>Revenue Breakdown</h3>
+      <div class="fin-row">
+        <span class="fin-label">Total Sell Value (Units × Sell Price)</span>
+        <span class="fin-val">$${fmtNum(totalSell,2)}</span>
+      </div>
+      <div class="fin-row negative">
+        <span class="fin-label">Amazon Referral Fee (${settings.referralFee}%)</span>
+        <span class="fin-val">−$${fmtNum(totalSell * referral,2)}</span>
+      </div>
+      <div class="fin-row negative">
+        <span class="fin-label">Amazon FBA Fee (${settings.fbaFee}%)</span>
+        <span class="fin-val">−$${fmtNum(totalSell * fba,2)}</span>
+      </div>
+      <div class="fin-row negative">
+        <span class="fin-label">Total COGS</span>
+        <span class="fin-val">−$${fmtNum(totalCOGS,2)}</span>
+      </div>
+      <div class="fin-row total ${netRevenue >= 0 ? 'positive' : 'negative'}">
+        <span class="fin-label">Net Revenue ${marginLabel}</span>
+        <span class="fin-val">$${fmtNum(netRevenue,2)}</span>
+      </div>
+    </div>
+    <div class="fin-block">
+      <h3>Shipment Valuation &amp; Summary</h3>
+      <div class="fin-row">
+        <span class="fin-label">Declared Value (COGS)</span>
+        <span class="fin-val fw-bold">$${fmtNum(totalCOGS,2)}</span>
+      </div>
+      <div class="fin-row">
+        <span class="fin-label">Insured Value (Sell Value)</span>
+        <span class="fin-val fw-bold">$${fmtNum(totalSell,2)}</span>
+      </div>
+      <div class="fin-row"><span class="fin-label">Total Pallets</span><span class="fin-val">${totalPallets}</span></div>
+      <div class="fin-row"><span class="fin-label">Total Shipment Weight</span><span class="fin-val">${fmtNum(totalWeight,0)} lbs</span></div>
+      <div class="fin-row"><span class="fin-label">Avg Weight per Pallet</span><span class="fin-val">${totalPallets > 0 ? fmtNum(totalWeight/totalPallets,0) : '—'} lbs</span></div>
+    </div>
+  </div>`;
+  document.getElementById('financialsSection').style.display = '';
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// RENDER: CARRIER TABLE
+// ─────────────────────────────────────────────────────────────────────
+function renderCarrierTable() {
+  const tbody = document.getElementById('carrierTbody');
+  tbody.innerHTML = '';
+  CARRIERS.forEach((carrier, i) => {
+    const tr = document.createElement('tr');
+    tr.dataset.carrier = i;
+    tr.innerHTML = `
+      <td class="carrier-name" id="cn-${i}">${esc(carrier)}</td>
+      <td>
+        <select onchange="updateCarrierCalc(${i})" id="ctype-${i}">
+          <option value="cwt">Per CWT</option>
+          <option value="flatpallet">Flat per Pallet</option>
+          <option value="total">Total Quote</option>
+        </select>
+      </td>
+      <td><input type="number" id="crate-${i}" placeholder="0.00" min="0" step="0.01" oninput="updateCarrierCalc(${i})"></td>
+      <td><input type="number" id="cfuel-${i}" placeholder="0.0" min="0" max="200" step="0.1" oninput="updateCarrierCalc(${i})" value="0"></td>
+      <td class="num" id="ctotal-${i}">—</td>
+      <td class="num" id="cperpal-${i}">—</td>
+    `;
+    tbody.appendChild(tr);
+  });
+}
+
+function updateCarrierCalc(idx) {
+  const type   = document.getElementById(`ctype-${idx}`).value;
+  const rate   = parseFloat(document.getElementById(`crate-${idx}`).value) || 0;
+  const fuel   = parseFloat(document.getElementById(`cfuel-${idx}`).value) || 0;
+  const fuelMult = 1 + fuel / 100;
+
+  let totalCost = 0;
+  const totalPallets = lastResult ? lastResult.pallets.length : 0;
+  const totalWeight  = lastResult ? lastResult.pallets.reduce((s, p) => s + p.totalWeight, 0) : 0;
+
+  if (type === 'cwt') {
+    totalCost = rate * (totalWeight / 100) * fuelMult;
+  } else if (type === 'flatpallet') {
+    totalCost = rate * totalPallets * fuelMult;
+  } else if (type === 'total') {
+    totalCost = rate * fuelMult;
+  }
+
+  const perPallet = totalPallets > 0 ? totalCost / totalPallets : 0;
+  document.getElementById(`ctotal-${idx}`).textContent  = totalCost  > 0 ? `$${fmtNum(totalCost,2)}`  : '—';
+  document.getElementById(`cperpal-${idx}`).textContent = perPallet  > 0 ? `$${fmtNum(perPallet,2)}` : '—';
+
+  highlightBestCarrier();
+}
+
+function highlightBestCarrier() {
+  const rows = document.querySelectorAll('#carrierTbody tr');
+  let bestVal = Infinity, bestIdx = -1;
+
+  rows.forEach((tr, i) => {
+    const totalEl = document.getElementById(`ctotal-${i}`);
+    const txt = totalEl.textContent;
+    if (txt === '—') return;
+    const val = parseFloat(txt.replace(/[$,]/g,''));
+    if (!isNaN(val) && val > 0 && val < bestVal) { bestVal = val; bestIdx = i; }
+  });
+
+  rows.forEach((tr, i) => {
+    tr.classList.remove('best-row');
+    const nameEl = document.getElementById(`cn-${i}`);
+    nameEl.innerHTML = esc(CARRIERS[i]);
+  });
+
+  if (bestIdx >= 0) {
+    rows[bestIdx].classList.add('best-row');
+    document.getElementById(`cn-${bestIdx}`).innerHTML =
+      esc(CARRIERS[bestIdx]) + '<span class="best-badge">BEST</span>';
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// MAIN OPTIMIZER ENTRY POINT
+// ─────────────────────────────────────────────────────────────────────
+function runOptimizer() {
+  const skus = getSKUData();
+  if (skus.length === 0) {
+    showStatus('No valid SKU data found. Please fill in SKU, dimensions, weight, and quantity.', 'error');
+    return;
+  }
+  const settings = getSettings();
+
+  // Validate settings
+  if (settings.palletL <= 0 || settings.palletW <= 0 || settings.maxHeight <= 0) {
+    showStatus('Invalid pallet settings. Please check dimensions.', 'error');
+    return;
+  }
+
+  const result = optimizePallets(skus, settings);
+  lastResult = result;
+
+  renderStatsBar(result.pallets, skus);
+  renderSKUSummary(skus, settings, result.pallets);
+  renderPallets(result.pallets, settings, skus);
+  renderFinancials(skus, settings, result.pallets);
+
+  // Update carrier calcs with new weight/pallet data
+  CARRIERS.forEach((_, i) => updateCarrierCalc(i));
+
+  // Status message
+  const warnings = result.pallets.filter(p => p.overHeight).length;
+  let msg = `Optimization complete: ${result.pallets.length} pallet${result.pallets.length !== 1 ? 's' : ''} created.`;
+  if (result.oversized.length > 0) {
+    msg += ` ⚠ ${result.oversized.length} SKU(s) too large for pallet (skipped): ${result.oversized.map(s=>s.sku).join(', ')}.`;
+    showStatus(msg, 'warning');
+  } else if (warnings > 0) {
+    msg += ` ⚠ ${warnings} pallet(s) exceed max height.`;
+    showStatus(msg, 'warning');
+  } else {
+    showStatus(msg, 'success');
+  }
+
+  // Scroll to results
+  document.getElementById('skuSummarySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+
+function renderResults(pallets, skus, settings) {
+  // Wrapper — called internally; individual render functions used directly
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// SAMPLE DATA
+// ─────────────────────────────────────────────────────────────────────
+function loadSampleData() {
+  clearAll();
+  const samples = [
+    { sku: 'CI-PRO-12',  desc: 'Pro Organizer 12-Pack',    l: 18, w: 12, h: 10, wt: 28, qty: 48,  sell: 34.99, cost: 9.50,  units: 12 },
+    { sku: 'CI-SHELF-L', desc: 'Shelf Liner Large Roll',   l: 24, w: 8,  h: 6,  wt: 15, qty: 72,  sell: 19.99, cost: 4.25,  units: 6  },
+    { sku: 'CI-HOOK-24', desc: 'Heavy Duty Hook Set 24ct', l: 10, w: 10, h: 8,  wt: 20, qty: 120, sell: 24.99, cost: 6.00,  units: 24 },
+    { sku: 'CI-BIN-MED', desc: 'Storage Bin Medium 4-pk',  l: 20, w: 15, h: 12, wt: 35, qty: 36,  sell: 44.99, cost: 13.00, units: 4  },
+    { sku: 'CI-DRAWER',  desc: 'Stackable Drawer Unit',    l: 16, w: 14, h: 10, wt: 30, qty: 60,  sell: 39.99, cost: 11.50, units: 2  },
+  ];
+  samples.forEach(s => addSKURow(s));
+}
+
+function clearAll() {
+  document.getElementById('skuTbody').innerHTML = '';
+  skuRowCount = 0;
+  document.getElementById('statusMsg').className = 'status-msg';
+  document.getElementById('statusMsg').style.display = 'none';
+  document.getElementById('palletResultsSection').style.display = 'none';
+  document.getElementById('skuSummarySection').style.display = 'none';
+  document.getElementById('financialsSection').style.display = 'none';
+  document.getElementById('st-pallets').textContent = '—';
+  document.getElementById('st-warnings').textContent = '—';
+  document.getElementById('st-weight').textContent = '—';
+  document.getElementById('st-volume').textContent = '—';
+  document.getElementById('st-skus').textContent = '—';
+  lastResult = null;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// UI HELPERS
+// ─────────────────────────────────────────────────────────────────────
+function toggleSection(header) {
+  header.classList.toggle('collapsed');
+  const body = header.nextElementSibling;
+  body.classList.toggle('hidden');
+}
+
+function showStatus(msg, type) {
+  const el = document.getElementById('statusMsg');
+  el.textContent = msg;
+  el.className = `status-msg ${type}`;
+}
+
+function fmtNum(n, decimals) {
+  return Number(n).toLocaleString('en-US', {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals
+  });
+}
+
+function esc(str) {
+  return String(str)
+    .replace(/&/g,'&amp;')
+    .replace(/</g,'&lt;')
+    .replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;');
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// PASTE IMPORT
+// ─────────────────────────────────────────────────────────────────────
+function openImportModal() {
+  document.getElementById('importModal').style.display = 'flex';
+  document.getElementById('importTextarea').focus();
+}
+function closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  document.getElementById('importTextarea').value = '';
+  document.getElementById('importError').textContent = '';
+}
+
+function runImport() {
+  const raw = document.getElementById('importTextarea').value.trim();
+  const errEl = document.getElementById('importError');
+  errEl.textContent = '';
+  if (!raw) { errEl.textContent = 'Nothing pasted yet.'; return; }
+
+  const rows = raw.split(/\r?\n/).map(r => r.split('\t'));
+  const parsed = [];
+
+  for (let i = 0; i < rows.length; i++) {
+    const cols = rows[i].map(c => c.trim());
+    // Skip completely blank rows or header-looking rows
+    if (!cols[0] || cols[0].toLowerCase() === 'sku' || cols[0].toLowerCase() === 'item') continue;
+
+    // Expected columns (tab-separated, 7 cols):
+    // SKU | Box Dims (LxWxH) | Qty | Weight | Units/Box | Sell$ | Cost$
+    if (cols.length < 4) { errEl.textContent = `Row ${i+1}: not enough columns (got ${cols.length}, need 7). Check format.`; return; }
+
+    const sku   = cols[0];
+    const dims  = cols[1]; // e.g. "19.5x15.75x10.5" or "20x15x12.5"
+    const qty   = parseFloat(cols[2]);
+    const wt    = parseFloat(cols[3]);
+    const units = parseFloat(cols[4]) || 1;
+    const sell  = parseFloat(cols[5]) || 0;
+    const cost  = parseFloat(cols[6]) || 0;
+
+    // Parse dims — split on "x" or "X", handle decimals
+    const dimParts = dims.split(/x/i).map(d => parseFloat(d.trim()));
+    if (dimParts.length < 3 || dimParts.some(isNaN)) {
+      errEl.textContent = `Row ${i+1} (${sku}): can't parse dims "${dims}". Use format like 19.5x15.75x10.5`;
+      return;
+    }
+
+    if (isNaN(qty) || qty <= 0) { errEl.textContent = `Row ${i+1} (${sku}): invalid qty "${cols[2]}"`; return; }
+    if (isNaN(wt)  || wt  <= 0) { errEl.textContent = `Row ${i+1} (${sku}): invalid weight "${cols[3]}"`; return; }
+
+    parsed.push({ sku, desc: sku, l: dimParts[0], w: dimParts[1], h: dimParts[2], wt, qty, sell, cost, units });
+  }
+
+  if (parsed.length === 0) { errEl.textContent = 'No valid rows found. Check your format.'; return; }
+
+  // Clear existing rows and load imported data
+  document.getElementById('skuTbody').innerHTML = '';
+  skuRowCount = 0;
+  parsed.forEach(s => addSKURow(s));
+  closeImportModal();
+  showStatus(`✓ Imported ${parsed.length} SKUs — click Optimize Pallets when ready.`, 'success');
+}
+</script>
+
+<!-- PASTE IMPORT MODAL -->
+<div id="importModal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.55);z-index:1000;align-items:center;justify-content:center;">
+  <div style="background:#fff;border-radius:10px;padding:28px;width:660px;max-width:95vw;box-shadow:0 20px 60px rgba(0,0,0,0.3);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <h2 style="font-size:17px;font-weight:800;color:#1E3A5F;">&#128203; Paste Import from Spreadsheet</h2>
+      <button onclick="closeImportModal()" style="background:none;border:none;font-size:22px;cursor:pointer;color:#6B7280;">&#10005;</button>
+    </div>
+
+    <div style="background:#FFF8E1;border:1px solid #F59E0B;border-radius:6px;padding:12px 14px;margin-bottom:14px;font-size:13px;line-height:1.7;">
+      <strong>How to paste from your Google Sheet:</strong><br>
+      In your Pallet Planner, select these 7 columns in this order, then copy &amp; paste below:<br>
+      <code style="background:#FEF3C7;padding:2px 6px;border-radius:4px;font-size:12px;">
+        Item &nbsp;|&nbsp; Box Dims &nbsp;|&nbsp; Boxes &nbsp;|&nbsp; Weight &nbsp;|&nbsp; Units per Box &nbsp;|&nbsp; Unit Sell &nbsp;|&nbsp; Unit Cost
+      </code><br>
+      <span style="color:#6B7280;">Tip: hold Ctrl and click each column header to select non-adjacent columns, then copy.</span>
+    </div>
+
+    <textarea id="importTextarea"
+      placeholder="Paste your spreadsheet data here (tab-separated)..."
+      style="width:100%;height:200px;border:1px solid #D1D5DB;border-radius:6px;padding:10px;font-size:13px;font-family:monospace;resize:vertical;background:#FFFDE7;"></textarea>
+
+    <div id="importError" style="color:#EF4444;font-size:12px;margin-top:6px;min-height:18px;"></div>
+
+    <div style="display:flex;gap:10px;margin-top:14px;justify-content:flex-end;">
+      <button onclick="closeImportModal()" style="padding:8px 18px;border:1px solid #D1D5DB;border-radius:6px;background:#fff;cursor:pointer;font-size:13px;">Cancel</button>
+      <button onclick="runImport()" style="padding:8px 22px;border:none;border-radius:6px;background:#1E3A5F;color:#fff;font-weight:700;cursor:pointer;font-size:13px;">&#9654; Import</button>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
