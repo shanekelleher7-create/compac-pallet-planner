@@ -51,28 +51,18 @@
     z-index: 100;
     box-shadow: 0 2px 8px rgba(0,0,0,0.3);
   }
-  .site-header .logo {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .site-header .logo { display: flex; align-items: center; gap: 12px; }
   .site-header .logo-icon {
     width: 36px; height: 36px;
-    background: var(--amber);
-    border-radius: 6px;
+    background: var(--amber); border-radius: 6px;
     display: flex; align-items: center; justify-content: center;
     font-weight: 900; font-size: 18px; color: var(--navy);
   }
-  .site-header h1 {
-    font-size: 20px; font-weight: 700; letter-spacing: -0.3px;
-  }
-  .site-header .subtitle {
-    font-size: 11px; color: #94B4D1; margin-top: 1px;
-  }
-  .header-actions { display: flex; gap: 10px; align-items: center; }
+  .subtitle { font-size: 11px; color: #94B4D1; margin-top: 1px; }
+  .header-actions { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
   .btn {
-    padding: 7px 16px; border-radius: var(--radius-sm); border: none; cursor: pointer;
-    font-size: 13px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 6px;
+    padding: 7px 14px; border-radius: var(--radius-sm); border: none; cursor: pointer;
+    font-size: 13px; font-weight: 600; transition: all 0.15s; display: inline-flex; align-items: center; gap: 5px;
   }
   .btn-primary { background: var(--amber); color: var(--navy); }
   .btn-primary:hover { background: var(--amber-dark); }
@@ -83,6 +73,10 @@
   .btn-ghost { background: var(--gray-100); color: var(--gray-700); border: 1px solid var(--gray-200); }
   .btn-ghost:hover { background: var(--gray-200); }
   .btn-sm { padding: 4px 10px; font-size: 12px; }
+  .btn-manual { background: #EDE9FE; color: #5B21B6; border: 1px solid #C4B5FD; }
+  .btn-manual:hover { background: #DDD6FE; }
+  .btn-manual.active { background: #5B21B6; color: #fff; border-color: #5B21B6; }
+  .btn-xs { padding: 2px 7px; font-size: 11px; }
 
   /* MAIN LAYOUT */
   .main { max-width: 1600px; margin: 0 auto; padding: 20px 20px 40px; }
@@ -95,10 +89,8 @@
     margin-bottom: 20px;
   }
   .stat-card {
-    background: #fff;
-    border-radius: var(--radius);
-    padding: 14px 18px;
-    box-shadow: var(--card-shadow);
+    background: #fff; border-radius: var(--radius);
+    padding: 14px 18px; box-shadow: var(--card-shadow);
     border-left: 4px solid var(--navy);
   }
   .stat-card.warn { border-left-color: var(--red); }
@@ -107,17 +99,10 @@
   .stat-card.warn .stat-value { color: var(--red); }
 
   /* SECTION CARDS */
-  .section-card {
-    background: #fff;
-    border-radius: var(--radius);
-    box-shadow: var(--card-shadow);
-    margin-bottom: 20px;
-  }
+  .section-card { background: #fff; border-radius: var(--radius); box-shadow: var(--card-shadow); margin-bottom: 20px; }
   .section-header {
-    background: var(--navy);
-    color: #fff;
-    padding: 12px 20px;
-    border-radius: var(--radius) var(--radius) 0 0;
+    background: var(--navy); color: #fff;
+    padding: 12px 20px; border-radius: var(--radius) var(--radius) 0 0;
     display: flex; align-items: center; justify-content: space-between;
     cursor: pointer; user-select: none;
   }
@@ -127,27 +112,25 @@
   .section-body { padding: 20px; }
   .section-body.hidden { display: none; }
 
-  /* SETTINGS PANEL */
-  .settings-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
-    gap: 14px;
-  }
+  /* SETTINGS */
+  .settings-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 14px; }
   .field-group label { display: block; font-size: 11px; color: var(--gray-500); margin-bottom: 4px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.4px; }
   .field-group input, .field-group select {
     width: 100%; padding: 7px 10px;
     border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
-    font-size: 13px; background: var(--input-bg);
-    color: var(--gray-900); outline: none;
-    transition: border-color 0.15s;
+    font-size: 13px; background: var(--input-bg); color: var(--gray-900);
+    outline: none; transition: border-color 0.15s;
   }
   .field-group input:focus, .field-group select:focus { border-color: var(--amber); }
+  .field-group.checkbox-group { display: flex; align-items: center; gap: 8px; padding-top: 18px; }
+  .field-group.checkbox-group label { margin-bottom: 0; font-size: 12px; text-transform: none; }
+  .field-group.checkbox-group input[type="checkbox"] {
+    width: 16px; height: 16px; cursor: pointer; accent-color: var(--amber); flex-shrink: 0;
+  }
 
   /* SKU TABLE */
   .sku-table-wrap { overflow-x: auto; }
-  table.sku-table {
-    width: 100%; border-collapse: collapse; min-width: 900px;
-  }
+  table.sku-table { width: 100%; border-collapse: collapse; min-width: 900px; }
   .sku-table th {
     background: var(--navy); color: #fff;
     padding: 9px 10px; text-align: left; font-size: 11px; font-weight: 700;
@@ -155,7 +138,11 @@
   }
   .sku-table th:first-child { border-radius: var(--radius-sm) 0 0 0; }
   .sku-table th:last-child { border-radius: 0 var(--radius-sm) 0 0; }
-  .sku-table td { padding: 6px 8px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
+  /* overflow: visible so expanded inputs can overlap adjacent cells */
+  .sku-table td {
+    padding: 6px 8px; border-bottom: 1px solid var(--gray-100);
+    vertical-align: middle; position: relative; overflow: visible;
+  }
   .sku-table tr:last-child td { border-bottom: none; }
   .sku-table tr:hover td { background: #F0F7FF; }
   .sku-table input[type="text"], .sku-table input[type="number"] {
@@ -165,12 +152,22 @@
     outline: none; transition: border-color 0.15s;
   }
   .sku-table input:focus { border-color: var(--amber-dark); box-shadow: 0 0 0 2px rgba(245,158,11,0.2); }
+  /* Expand text inputs on hover — overlay adjacent cells */
+  .sku-table input[type="text"]:hover {
+    position: absolute;
+    left: 4px; top: 50%;
+    transform: translateY(-50%);
+    width: auto; min-width: 220px;
+    z-index: 30;
+    background: #fff;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.22);
+    border-color: var(--amber-dark) !important;
+  }
   .sku-table .col-sku { min-width: 90px; }
   .sku-table .col-desc { min-width: 130px; }
   .sku-table .col-num { min-width: 72px; }
   .sku-table .col-action { min-width: 40px; text-align: center; }
   .row-num { font-size: 11px; color: var(--gray-500); font-weight: 700; text-align: center; }
-
   .table-actions { display: flex; gap: 10px; margin-top: 14px; flex-wrap: wrap; align-items: center; }
 
   /* STATUS MESSAGE */
@@ -184,10 +181,7 @@
 
   /* SKU SUMMARY TABLE */
   table.summary-table { width: 100%; border-collapse: collapse; }
-  .summary-table th {
-    background: var(--navy); color: #fff; padding: 8px 12px;
-    font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-align: left;
-  }
+  .summary-table th { background: var(--navy); color: #fff; padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-align: left; }
   .summary-table td { padding: 7px 12px; border-bottom: 1px solid var(--gray-100); font-size: 13px; }
   .summary-table tr:last-child td { border-bottom: none; }
   .summary-table tr:hover td { background: #F0F7FF; }
@@ -195,21 +189,24 @@
   .sku-color-dot { width: 12px; height: 12px; border-radius: 3px; display: inline-block; margin-right: 6px; vertical-align: middle; }
 
   /* PALLET GRID */
-  .pallet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+  .pallet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
 
   /* PALLET CARD */
   .pallet-card {
     background: #fff; border-radius: var(--radius);
-    box-shadow: var(--card-shadow); overflow: hidden;
+    box-shadow: var(--card-shadow); overflow: visible;
     border: 1px solid var(--gray-200);
   }
   .pallet-card-header {
     background: var(--navy); color: #fff;
-    padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 14px; display: flex; align-items: flex-start; justify-content: space-between;
+    gap: 8px; border-radius: var(--radius) var(--radius) 0 0;
   }
+  .pallet-card-header .pallet-info { flex: 1; min-width: 0; }
   .pallet-card-header .pallet-num { font-size: 15px; font-weight: 800; }
-  .pallet-card-header .pallet-ht { font-size: 12px; color: #94B4D1; }
+  .pallet-card-header .pallet-ht { font-size: 11px; color: #94B4D1; line-height: 1.4; }
   .pallet-card-header .pallet-ht.over { color: #FCA5A5; font-weight: 700; }
+  .pallet-card-actions { display: flex; gap: 5px; align-items: center; flex-shrink: 0; padding-top: 2px; }
   .warn-badge {
     background: var(--red); color: #fff; font-size: 10px; font-weight: 700;
     padding: 2px 7px; border-radius: 20px;
@@ -228,18 +225,50 @@
   .freight-row .fc-label { font-size: 11px; font-weight: 700; color: var(--navy); }
   .freight-row .fc-value { font-size: 20px; font-weight: 900; color: var(--navy); }
 
-  .layer-table-wrap { max-height: 160px; overflow-y: auto; }
+  /* Layer table — fully expands, NO internal scroll */
+  .layer-table-wrap { overflow: visible; }
   table.layer-table { width: 100%; border-collapse: collapse; }
-  .layer-table th { background: var(--gray-100); font-size: 10px; color: var(--gray-500); padding: 5px 10px; text-align: left; position: sticky; top: 0; }
-  .layer-table td { padding: 4px 10px; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
+  .layer-table th { background: var(--gray-100); font-size: 10px; color: var(--gray-500); padding: 5px 10px; text-align: left; }
+  .layer-table td { padding: 5px 8px; border-bottom: 1px solid var(--gray-100); font-size: 12px; }
   .layer-table tr:last-child td { border-bottom: none; }
   .layer-sku-chip {
     display: inline-block; padding: 1px 6px; border-radius: 3px; font-size: 11px; font-weight: 700;
     color: #fff; margin-right: 3px; margin-bottom: 2px;
   }
 
-  .pallet-viz { padding: 12px 14px; background: var(--gray-50); border-top: 1px solid var(--gray-200); }
-  .pallet-viz svg { display: block; margin: 0 auto; }
+  /* MANUAL MODE (Tetris) */
+  .manual-mode-bar {
+    background: #F5F3FF; border-top: 2px solid #8B5CF6;
+    padding: 8px 14px; display: flex; align-items: center; justify-content: space-between; gap: 8px;
+  }
+  .manual-mode-bar .mm-label { font-size: 11px; font-weight: 700; color: #5B21B6; }
+  .layer-table tr.manual-row { cursor: grab; }
+  .layer-table tr.manual-row:active { cursor: grabbing; }
+  .layer-table tr.dragging { opacity: 0.35; background: #EDE9FE; }
+  .layer-table tr.drag-over > td { border-top: 2px solid #8B5CF6 !important; background: #F5F3FF; }
+  .drag-handle {
+    color: var(--gray-300); font-size: 13px; cursor: grab; user-select: none;
+    padding: 0 4px; letter-spacing: -1px;
+  }
+  .drag-handle:active { cursor: grabbing; }
+
+  /* SVG viz — auto-height */
+  .pallet-viz { padding: 12px 14px; background: var(--gray-50); border-top: 1px solid var(--gray-200); overflow: visible; }
+  .pallet-viz svg { display: block; margin: 0 auto; overflow: visible; }
+
+  /* DEBUG PANEL */
+  .debug-panel {
+    background: #1A1B2E; color: #A9B1D6; font-family: 'Consolas', 'Courier New', monospace; font-size: 11px;
+    padding: 12px 16px; border-top: 1px solid var(--gray-200);
+    white-space: pre; overflow-x: auto; line-height: 1.7;
+    border-radius: 0 0 var(--radius) var(--radius);
+  }
+  .dbg-head { color: #7DCFFF; font-weight: bold; }
+  .dbg-layer { color: #7AA2F7; }
+  .dbg-ok { color: #9ECE6A; }
+  .dbg-warn { color: #F7768E; font-weight: bold; }
+  .dbg-dim { color: #565F89; }
+  .dbg-orient { color: #E0AF68; }
 
   /* COLOR LEGEND */
   .legend-wrap { display: flex; flex-wrap: wrap; gap: 10px; padding: 14px 20px; }
@@ -256,36 +285,23 @@
   .fin-row.negative .fin-val { color: var(--red); }
   .fin-label { color: var(--gray-700); }
   .fin-val { font-variant-numeric: tabular-nums; }
-  .margin-badge {
-    display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: 11px; font-weight: 700;
-    margin-left: 8px;
-  }
+  .margin-badge { display: inline-block; padding: 1px 8px; border-radius: 20px; font-size: 11px; font-weight: 700; margin-left: 8px; }
   .margin-badge.good { background: #D1FAE5; color: #065F46; }
   .margin-badge.ok { background: #FEF3C7; color: #92400E; }
   .margin-badge.bad { background: #FEE2E2; color: #991B1B; }
 
   /* CARRIER TABLE */
   table.carrier-table { width: 100%; border-collapse: collapse; }
-  .carrier-table th {
-    background: var(--navy); color: #fff; padding: 8px 12px;
-    font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-align: left;
-  }
+  .carrier-table th { background: var(--navy); color: #fff; padding: 8px 12px; font-size: 11px; font-weight: 700; letter-spacing: 0.4px; text-align: left; }
   .carrier-table td { padding: 7px 10px; border-bottom: 1px solid var(--gray-100); vertical-align: middle; }
   .carrier-table tr:last-child td { border-bottom: none; }
-  .carrier-table input, .carrier-table select {
-    width: 100%; padding: 5px 8px;
-    border: 1.5px solid var(--input-border); border-radius: var(--radius-sm);
-    background: var(--input-bg); font-size: 13px; outline: none;
-  }
+  .carrier-table input, .carrier-table select { width: 100%; padding: 5px 8px; border: 1.5px solid var(--input-border); border-radius: var(--radius-sm); background: var(--input-bg); font-size: 13px; outline: none; }
   .carrier-table input:focus, .carrier-table select:focus { border-color: var(--amber-dark); }
   .carrier-table .best-row td { background: #D1FAE5; }
   .carrier-table .best-row td:first-child { border-left: 4px solid var(--green); }
   .carrier-table .num { text-align: right; font-variant-numeric: tabular-nums; font-weight: 600; }
   .carrier-name { font-weight: 700; color: var(--navy); }
-  .best-badge {
-    display: inline-block; background: var(--green); color: #fff;
-    font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 20px; margin-left: 5px;
-  }
+  .best-badge { display: inline-block; background: var(--green); color: #fff; font-size: 9px; font-weight: 800; padding: 1px 6px; border-radius: 20px; margin-left: 5px; }
 
   /* RESPONSIVE */
   @media (max-width: 900px) {
@@ -305,19 +321,17 @@
     .section-body.hidden { display: block !important; }
     .btn { display: none; }
     .pallet-grid { grid-template-columns: repeat(3, 1fr); }
+    .debug-panel { display: none; }
   }
 
   /* MISC */
   .divider { height: 1px; background: var(--gray-200); margin: 16px 0; }
   .empty-state { text-align: center; padding: 40px 20px; color: var(--gray-500); }
-  .empty-state .es-icon { font-size: 48px; margin-bottom: 12px; }
-  .empty-state p { font-size: 14px; }
   .text-right { text-align: right; }
   .text-muted { color: var(--gray-500); }
   .fw-bold { font-weight: 700; }
   .mt-8 { margin-top: 8px; }
   .mt-16 { margin-top: 16px; }
-  .no-results { padding: 30px; text-align: center; color: var(--gray-500); font-size: 13px; }
 </style>
 </head>
 <body>
@@ -327,11 +341,12 @@
   <div class="logo">
     <div class="logo-icon">CI</div>
     <div>
-      <div class="site-header h1" style="font-size:18px;font-weight:800;color:#fff;">Compac Industries</div>
+      <div style="font-size:18px;font-weight:800;color:#fff;">Compac Industries</div>
       <div class="subtitle">Amazon FBA Pallet Optimizer</div>
     </div>
   </div>
   <div class="header-actions">
+    <button class="btn btn-secondary btn-sm" onclick="copyShareableLink()">&#128279; Copy Link</button>
     <button class="btn btn-secondary btn-sm" onclick="openImportModal()">&#128203; Paste Import</button>
     <button class="btn btn-secondary btn-sm" onclick="loadSampleData()">&#9654; Sample Data</button>
     <button class="btn btn-secondary btn-sm" onclick="clearAll()">&#10005; Clear</button>
@@ -398,12 +413,20 @@
           <input type="number" id="palletWeight" value="50" min="0">
         </div>
         <div class="field-group">
+          <label>Max Pallet Weight (lbs, 0=none)</label>
+          <input type="number" id="maxPalletWeight" value="1500" min="0">
+        </div>
+        <div class="field-group">
           <label>Amazon Referral Fee %</label>
           <input type="number" id="referralFee" value="15" min="0" max="100" step="0.1">
         </div>
         <div class="field-group">
           <label>Amazon FBA Fee %</label>
           <input type="number" id="fbaFee" value="25" min="0" max="100" step="0.1">
+        </div>
+        <div class="field-group checkbox-group">
+          <input type="checkbox" id="debugMode">
+          <label for="debugMode">Debug Mode (verbose per-layer breakdown)</label>
         </div>
       </div>
     </div>
@@ -519,11 +542,19 @@ const SKU_COLORS = [
 let skuRowCount = 0;
 let lastResult = null;
 
+// Manual (Tetris) mode state per pallet
+// { [palletIdx]: { enabled: bool, layers: [...], original: [...] } }
+let manualModes = {};
+let dragState = { fromPalletIdx: null, fromLayerIdx: null };
+
 // ─────────────────────────────────────────────────────────────────────
 // INITIALIZATION
 // ─────────────────────────────────────────────────────────────────────
 window.addEventListener('DOMContentLoaded', () => {
-  for (let i = 0; i < 3; i++) addSKURow();
+  loadFromURL();
+  if (document.getElementById('skuTbody').children.length === 0) {
+    for (let i = 0; i < 3; i++) addSKURow();
+  }
   renderCarrierTable();
 });
 
@@ -538,8 +569,8 @@ function addSKURow(data) {
   const d = data || {};
   tr.innerHTML = `
     <td class="row-num">${tbody.children.length + 1}</td>
-    <td><input type="text" class="col-sku" placeholder="SKU-001" value="${d.sku||''}"></td>
-    <td><input type="text" class="col-desc" placeholder="Product name" value="${d.desc||''}"></td>
+    <td><input type="text" class="col-sku" placeholder="SKU-001" value="${esc(d.sku||'')}"></td>
+    <td><input type="text" class="col-desc" placeholder="Product name" value="${esc(d.desc||'')}"></td>
     <td><input type="number" class="col-num" placeholder="14" min="1" step="0.1" value="${d.l||''}"></td>
     <td><input type="number" class="col-num" placeholder="10" min="1" step="0.1" value="${d.w||''}"></td>
     <td><input type="number" class="col-num" placeholder="8"  min="1" step="0.1" value="${d.h||''}"></td>
@@ -585,15 +616,37 @@ function getSKUData() {
   return rows;
 }
 
+function getAllFormRows() {
+  // For URL serialization — includes rows with partial data
+  const rows = [];
+  document.querySelectorAll('#skuTbody tr').forEach(tr => {
+    const inputs = tr.querySelectorAll('input');
+    rows.push({
+      sku:  inputs[0].value,
+      desc: inputs[1].value,
+      l:    inputs[2].value,
+      w:    inputs[3].value,
+      h:    inputs[4].value,
+      wt:   inputs[5].value,
+      qty:  inputs[6].value,
+      sell: inputs[7].value,
+      cost: inputs[8].value,
+      units:inputs[9].value,
+    });
+  });
+  return rows;
+}
+
 function getSettings() {
   return {
-    palletL:       parseFloat(document.getElementById('palletL').value)       || 40,
-    palletW:       parseFloat(document.getElementById('palletW').value)       || 48,
-    maxHeight:     parseFloat(document.getElementById('maxHeight').value)     || 72,
-    palletBoardH:  parseFloat(document.getElementById('palletBoardH').value)  || 5,
-    palletWeight:  parseFloat(document.getElementById('palletWeight').value)  || 50,
-    referralFee:  parseFloat(document.getElementById('referralFee').value)  || 15,
-    fbaFee:       parseFloat(document.getElementById('fbaFee').value)       || 25,
+    palletL:          parseFloat(document.getElementById('palletL').value)          || 40,
+    palletW:          parseFloat(document.getElementById('palletW').value)          || 48,
+    maxHeight:        parseFloat(document.getElementById('maxHeight').value)        || 72,
+    palletBoardH:     parseFloat(document.getElementById('palletBoardH').value)     || 5,
+    palletWeight:     parseFloat(document.getElementById('palletWeight').value)     || 50,
+    maxPalletWeight:  parseFloat(document.getElementById('maxPalletWeight').value)  || 0,
+    referralFee:      parseFloat(document.getElementById('referralFee').value)      || 15,
+    fbaFee:           parseFloat(document.getElementById('fbaFee').value)           || 25,
   };
 }
 
@@ -602,52 +655,112 @@ function getSettings() {
 // ─────────────────────────────────────────────────────────────────────
 
 /**
- * Compute boxes per layer for a SKU on a pallet.
- * Tries both L/W orientations and returns the max.
+ * Try all 3 distinct face orientations (each face tried both rotations = 6 total).
+ * Picks the orientation that maximizes total boxes on pallet (bpl × floor(stackLimit/h)).
+ * Tie-break: prefer least layer height (more stacking flexibility).
+ *
+ * Returns { bpl, h, orientIdx, label }
+ *   bpl       — boxes per layer for the chosen orientation
+ *   h         — effective layer height for the chosen orientation
+ *   orientIdx — 0=bottom face (L×W), 1=side face (L×H), 2=end face (W×H)
+ *   label     — human-readable orientation string
  */
-function computeBoxesPerLayer(boxL, boxW, palletL, palletW) {
-  const o1 = Math.floor(palletL / boxL) * Math.floor(palletW / boxW);
-  const o2 = Math.floor(palletL / boxW) * Math.floor(palletW / boxL);
-  return Math.max(o1, o2);
+function computeBestOrientation(boxL, boxW, boxH, palletL, palletW, stackLimit) {
+  // Each entry: [footprintA, footprintB, standingHeight, faceIndex]
+  const faces = [
+    [boxL, boxW, boxH, 0],  // lay flat on bottom: L×W footprint, H tall
+    [boxL, boxH, boxW, 1],  // stand on side: L×H footprint, W tall
+    [boxW, boxH, boxL, 2],  // stand on end: W×H footprint, L tall
+  ];
+  const faceLabels = [
+    `${boxL}"×${boxW}" footprint, ${boxH}" tall`,
+    `${boxL}"×${boxH}" footprint, ${boxW}" tall`,
+    `${boxW}"×${boxH}" footprint, ${boxL}" tall`,
+  ];
+
+  let best = { bpl: 0, h: Infinity, total: 0, orientIdx: 0, label: '' };
+
+  for (const [a, b, h, idx] of faces) {
+    if (h <= 0 || h > stackLimit) continue;
+    // Try both rotations of the footprint on the pallet
+    const bpl = Math.max(
+      Math.floor(palletL / a) * Math.floor(palletW / b),
+      Math.floor(palletL / b) * Math.floor(palletW / a)
+    );
+    if (bpl === 0) continue;
+    const maxLayers = Math.floor(stackLimit / h);
+    const total = bpl * maxLayers;
+    if (total > best.total || (total === best.total && h < best.h)) {
+      best = { bpl, h, total, orientIdx: idx, label: faceLabels[idx] };
+    }
+  }
+  return best;
+}
+
+/**
+ * For display in SKU summary — returns max bpl across all orientations
+ * (does not need stackLimit since we're just showing capability).
+ */
+function computeBoxesPerLayerDisplay(boxL, boxW, boxH, palletL, palletW) {
+  const faces = [
+    [boxL, boxW], [boxL, boxH], [boxW, boxH],
+  ];
+  let maxBpl = 0;
+  for (const [a, b] of faces) {
+    maxBpl = Math.max(maxBpl,
+      Math.floor(palletL / a) * Math.floor(palletW / b),
+      Math.floor(palletL / b) * Math.floor(palletW / a)
+    );
+  }
+  return maxBpl;
 }
 
 /**
  * NMFC freight class lookup by density (lbs/cu ft)
  */
 function getFreightClass(density) {
-  if (density >= 35)  return '55';
-  if (density >= 30)  return '60';
-  if (density >= 22.5)return '65';
-  if (density >= 15)  return '70';
-  if (density >= 12)  return '85';
-  if (density >= 10)  return '92.5';
-  if (density >= 8)   return '100';
-  if (density >= 6)   return '125';
-  if (density >= 4)   return '175';
-  if (density >= 2)   return '250';
-  if (density >= 1)   return '300';
+  if (density >= 35)   return '55';
+  if (density >= 30)   return '60';
+  if (density >= 22.5) return '65';
+  if (density >= 15)   return '70';
+  if (density >= 12)   return '85';
+  if (density >= 10)   return '92.5';
+  if (density >= 8)    return '100';
+  if (density >= 6)    return '125';
+  if (density >= 4)    return '175';
+  if (density >= 2)    return '250';
+  if (density >= 1)    return '300';
   return '400';
 }
 
 /**
- * Main optimizer. Returns array of pallet objects.
- * Each pallet: { layers: [{skuIdx, sku, count, heightIn, color}], totalHeight, totalWeight }
+ * Main optimizer. Returns { pallets, oversized, skuData }.
+ * Each pallet: { layers, totalHeight, reportedHeight, overHeight, totalWeight }
+ * Each layer: { skuIdx, sku, desc, count, heightIn, h, fullLayers, color, segments, mixed? }
  */
 function optimizePallets(skus, settings) {
-  const { palletL, palletW, maxHeight, palletBoardH, palletWeight } = settings;
-  const stackLimit = maxHeight - palletBoardH; // usable height for boxes
+  const { palletL, palletW, maxHeight, palletBoardH, palletWeight, maxPalletWeight } = settings;
+  const stackLimit = maxHeight - palletBoardH;
+  const maxWt = maxPalletWeight || 0;
   const ITER_LIMIT = 100000;
 
-  // Precompute per-SKU data
-  const skuData = skus.map((s, i) => ({
-    ...s,
-    idx: i,
-    color: SKU_COLORS[i % SKU_COLORS.length],
-    bpl: computeBoxesPerLayer(s.l, s.w, palletL, palletW), // boxes per layer
-    remaining: s.qty,
-  }));
+  // Precompute per-SKU data using best orientation
+  const skuData = skus.map((s, i) => {
+    const orient = computeBestOrientation(s.l, s.w, s.h, palletL, palletW, stackLimit);
+    return {
+      ...s,
+      // preserve raw box dims for display/debug
+      rawL: s.l, rawW: s.w, rawH: s.h,
+      idx: i,
+      color: SKU_COLORS[i % SKU_COLORS.length],
+      bpl: orient.bpl,
+      h: orient.h,           // effective layer height for chosen orientation
+      orientLabel: orient.label,
+      orientIdx: orient.orientIdx,
+      remaining: s.qty,
+    };
+  });
 
-  // Warn about oversized
   const oversized = skuData.filter(s => s.bpl === 0);
 
   const pallets = [];
@@ -661,45 +774,39 @@ function optimizePallets(skus, settings) {
     let innerIter = 0;
     while (innerIter < ITER_LIMIT) {
       innerIter++;
-      // Find best primary SKU: most remaining that can fit at least 1 box and won't exceed height
+
+      // Find candidates: remaining boxes that fit height AND weight
       const candidates = skuData.filter(s =>
         s.remaining > 0 &&
         s.bpl > 0 &&
-        palletHeight + s.h <= stackLimit
+        palletHeight + s.h <= stackLimit &&
+        (maxWt <= 0 || pallet.totalWeight + s.wt <= maxWt)
       );
       if (candidates.length === 0) break;
 
-      // Prefer SKUs that can complete a full layer, else take partial
+      // Prefer SKUs that can complete a full layer
       const canComplete = candidates.filter(s => s.remaining >= s.bpl);
       const pool = canComplete.length > 0 ? canComplete : candidates;
 
       // FIX 1 — Prefer SKUs whose next layer still leaves room for different-height SKUs.
-      // This prevents a tall SKU from greedily filling the pallet (e.g. 6 × 10.5" = 63",
-      // leaving only 4" — too small for any other box) when keeping 1 layer of height
-      // available would allow mixing shorter-height boxes on the same pallet.
       const openPool = pool.filter(s => {
         const afterOneLayer = palletHeight + s.h;
         return skuData.some(o =>
           o !== s && o.remaining > 0 && o.bpl > 0 &&
-          o.h !== s.h && afterOneLayer + o.h <= stackLimit
+          o.h !== s.h && afterOneLayer + o.h <= stackLimit &&
+          (maxWt <= 0 || pallet.totalWeight + s.wt * s.bpl + o.wt <= maxWt)
         );
       });
-      // Fall back to full pool only if no SKU can keep the pallet "open"
       const usingOpenPool = openPool.length > 0;
       const finalPool = usingOpenPool ? openPool : pool;
       finalPool.sort((a, b) => b.remaining - a.remaining);
       const primary = finalPool[0];
 
-      // How many full layers of primary fit in the remaining height?
+      // How many full layers of primary fit in remaining height?
       const layersAvail = Math.floor((stackLimit - palletHeight) / primary.h);
       if (layersAvail === 0) break;
 
-      // FIX 2 — Cap layers placed so we always leave at least one layer of height
-      // available for different-height SKUs (when mixing is still possible).
-      // Guard: only reduce if the other-height SKU still has a FULL layer to place.
-      // If those SKUs are in "tail" territory (remaining < bpl), they'll fit as partials
-      // in whatever space is left and don't need a reserved layer — reducing here would
-      // only cause unnecessary overflow onto an extra pallet.
+      // FIX 2 — Cap layers to leave headroom for different-height mixing
       const otherDiffH = skuData.filter(s =>
         s !== primary && s.remaining > 0 && s.bpl > 0 && s.h !== primary.h
       );
@@ -707,16 +814,25 @@ function optimizePallets(skus, settings) {
       if (usingOpenPool && otherDiffH.length > 0) {
         const minOtherH = Math.min(...otherDiffH.map(s => s.h));
         const roomAfterAll = stackLimit - palletHeight - layersAvail * primary.h;
-        const otherHasFull = otherDiffH.some(s => s.remaining >= s.bpl); // has ≥1 full layer
+        const otherHasFull = otherDiffH.some(s => s.remaining >= s.bpl);
         if (roomAfterAll < minOtherH && otherHasFull) {
-          effectiveCap = layersAvail - 1; // give up 1 layer to keep mixing door open
+          effectiveCap = layersAvail - 1;
         }
       }
 
-      // Full layers to place (capped)
+      // Weight cap — don't blow the per-pallet weight limit
+      if (maxWt > 0 && primary.wt > 0 && primary.bpl > 0) {
+        const wtBudget = maxWt - pallet.totalWeight;
+        const boxesByWt = Math.floor(wtBudget / primary.wt);
+        const layersByWt = Math.floor(boxesByWt / primary.bpl);
+        effectiveCap = Math.min(effectiveCap, layersByWt);
+      }
+      if (effectiveCap <= 0) break;
+
+      // Full layers to place
       let fullLayers = Math.min(Math.floor(primary.remaining / primary.bpl), effectiveCap);
 
-      let boxesPlaced = 0; // track progress to detect stalls
+      let boxesPlaced = 0;
 
       if (fullLayers > 0) {
         const boxesUsed = fullLayers * primary.bpl;
@@ -737,15 +853,8 @@ function optimizePallets(skus, settings) {
         boxesPlaced += boxesUsed;
       }
 
-      // FIX 3 — Only run the partial-layer/filler logic when primary truly has a
-      // fractional layer left (remaining < bpl). Previously this also fired when
-      // remaining >= bpl (i.e. another full layer), which bypassed the effectiveCap
-      // limit and snuck an extra tall layer onto the pallet before mixing could happen.
-      //
-      // FIX 4 — Also skip the partial layer if placing it would seal the pallet height
-      // such that no different-height SKU can follow. This mirrors the effectiveCap
-      // logic applied to full layers above, and prevents e.g. a 3-box 71302 tail from
-      // pushing pallet height to 63" (4" remaining) when 5.5" misc boxes are waiting.
+      // FIX 3 — Partial layer only when primary truly has a fractional layer left
+      // FIX 4 — Skip partial if it would seal off height for other-height SKUs
       const otherDiffHPartial = skuData.filter(s =>
         s !== primary && s.remaining > 0 && s.bpl > 0 && s.h !== primary.h
       );
@@ -754,32 +863,46 @@ function optimizePallets(skus, settings) {
 
       if (primary.remaining > 0 && primary.remaining < primary.bpl &&
           palletHeight + primary.h <= stackLimit && !partialWouldCloseOff) {
+
         const layerH = primary.h;
-        let placedPrimary = primary.remaining; // all remaining (< 1 full layer)
-        let usedArea = placedPrimary * primary.l * primary.w;
+        let placedPrimary = primary.remaining;
+
+        // Weight cap for partial layer
+        if (maxWt > 0 && primary.wt > 0) {
+          const wtBudget = maxWt - pallet.totalWeight;
+          const maxByWt = Math.floor(wtBudget / primary.wt);
+          placedPrimary = Math.min(placedPrimary, maxByWt);
+        }
+
+        if (placedPrimary <= 0) { if (boxesPlaced === 0) break; continue; }
+
+        let usedArea = placedPrimary * primary.rawL * primary.rawW;
         const totalArea = palletL * palletW;
         const segments = [];
-
         segments.push({ skuIdx: primary.idx, sku: primary.sku, color: primary.color, count: placedPrimary, bpl: primary.bpl });
         primary.remaining -= placedPrimary;
         pallet.totalWeight += placedPrimary * primary.wt;
         boxesPlaced += placedPrimary;
 
-        // Fill remaining footprint area with same-height or shorter SKUs.
-        // Shorter boxes physically fit under the layer ceiling set by the primary SKU,
-        // so they don't increase the layer height — safe to co-locate on the footprint.
+        // Fill remaining footprint area with same-height or shorter SKUs
         const fillers = skuData.filter(s =>
           s.remaining > 0 && s.bpl > 0 && s.h <= layerH && s.idx !== primary.idx
         );
         fillers.sort((a, b) => b.remaining - a.remaining);
 
         for (const filler of fillers) {
+          if (maxWt > 0 && pallet.totalWeight >= maxWt) break;
           const remainingArea = totalArea - usedArea;
           if (remainingArea <= 0) break;
-          const boxArea = filler.l * filler.w;
+          const boxArea = filler.rawL * filler.rawW;
           const maxFit = Math.floor(remainingArea / boxArea);
           if (maxFit <= 0) continue;
-          const toPlace = Math.min(maxFit, filler.remaining);
+          let toPlace = Math.min(maxFit, filler.remaining);
+          // Weight cap
+          if (maxWt > 0 && filler.wt > 0) {
+            const wtBudget = maxWt - pallet.totalWeight;
+            toPlace = Math.min(toPlace, Math.floor(wtBudget / filler.wt));
+          }
           if (toPlace <= 0) continue;
           segments.push({ skuIdx: filler.idx, sku: filler.sku, color: filler.color, count: toPlace, bpl: filler.bpl });
           filler.remaining -= toPlace;
@@ -791,78 +914,66 @@ function optimizePallets(skus, settings) {
         const totalBoxes = segments.reduce((s, x) => s + x.count, 0);
         if (totalBoxes > 0) {
           pallet.layers.push({
-            skuIdx: primary.idx,
-            sku: primary.sku,
-            desc: primary.desc,
-            count: totalBoxes,
-            heightIn: layerH,
-            h: layerH,
-            fullLayers: 1,
-            color: primary.color,
-            segments,
-            mixed: segments.length > 1
+            skuIdx: primary.idx, sku: primary.sku, desc: primary.desc,
+            count: totalBoxes, heightIn: layerH, h: layerH, fullLayers: 1,
+            color: primary.color, segments, mixed: segments.length > 1
           });
           palletHeight += layerH;
         }
       }
 
-      // Safety: if nothing was placed this iteration, the pallet is done
       if (boxesPlaced === 0) break;
-
-      // If primary is exhausted, loop continues to next SKU
     }
 
     if (pallet.layers.length > 0) {
       pallet.totalHeight = pallet.layers.reduce((s, l) => s + l.heightIn, 0);
-      pallet.reportedHeight = pallet.totalHeight + palletBoardH; // total incl. pallet board
+      pallet.reportedHeight = pallet.totalHeight + palletBoardH;
       pallet.overHeight = pallet.reportedHeight > maxHeight;
       pallets.push(pallet);
     } else {
-      // Safety: if no layers placed but remaining > 0, break to avoid infinite loop
       break;
     }
   }
 
-  // CONSOLIDATION PASS — merge last pallet onto previous if combined height fits.
+  // CONSOLIDATION PASS — merge last pallet onto previous if combined height fits
   while (pallets.length > 1) {
     const last = pallets[pallets.length - 1];
     const prev = pallets[pallets.length - 2];
-    if (prev.totalHeight + last.totalHeight <= stackLimit) {
+    const combinedHt = prev.totalHeight + last.totalHeight;
+    const combinedWt = prev.totalWeight + last.totalWeight - palletWeight;
+    if (combinedHt <= stackLimit && (maxWt <= 0 || combinedWt <= maxWt)) {
       prev.layers = prev.layers.concat(last.layers);
-      prev.totalHeight += last.totalHeight;
+      prev.totalHeight = combinedHt;
       prev.reportedHeight = prev.totalHeight + palletBoardH;
       prev.overHeight = prev.reportedHeight > maxHeight;
-      prev.totalWeight += last.totalWeight - palletWeight;
+      prev.totalWeight = combinedWt;
       pallets.pop();
     } else {
       break;
     }
   }
 
-  // REDISTRIBUTION PASS — when the last pallet can't fully merge onto the previous,
-  // try moving its individual layers (tallest first) onto whichever earlier pallets
-  // have enough headroom. If all layers can be redistributed, the last pallet is
-  // eliminated entirely.
+  // REDISTRIBUTION PASS — move individual layers from last pallet onto earlier pallets
   if (pallets.length > 1) {
     const last = pallets[pallets.length - 1];
-    // Sort layers tallest-first so the hardest-to-place layers go first
     const layersToMove = [...last.layers].sort((a, b) => b.heightIn - a.heightIn);
     const moved = new Set();
 
     for (const layer of layersToMove) {
+      const layerWt = (layer.segments || []).reduce((s, seg) => {
+        const sd = skuData.find(d => d.idx === seg.skuIdx);
+        return s + (sd ? sd.wt * seg.count : 0);
+      }, 0);
       for (let i = 0; i < pallets.length - 1; i++) {
         const target = pallets[i];
-        if (target.totalHeight + layer.heightIn <= stackLimit) {
-          // Compute layer weight from segments
-          const layerWt = (layer.segments || []).reduce((s, seg) => {
-            const sd = skuData.find(d => d.idx === seg.skuIdx);
-            return s + (sd ? sd.wt * seg.count : 0);
-          }, 0);
+        const newHt = target.totalHeight + layer.heightIn;
+        const newWt = target.totalWeight + layerWt;
+        if (newHt <= stackLimit && (maxWt <= 0 || newWt <= maxWt)) {
           target.layers = target.layers.concat([layer]);
-          target.totalHeight += layer.heightIn;
+          target.totalHeight = newHt;
           target.reportedHeight = target.totalHeight + palletBoardH;
           target.overHeight = target.reportedHeight > maxHeight;
-          target.totalWeight += layerWt;
+          target.totalWeight = newWt;
           moved.add(layer);
           break;
         }
@@ -892,10 +1003,9 @@ function optimizePallets(skus, settings) {
 // ─────────────────────────────────────────────────────────────────────
 function renderStatsBar(pallets, skus) {
   const totalWeight = pallets.reduce((s, p) => s + p.totalWeight, 0);
-  const totalVolume = pallets.reduce((s, p) => {
-    const settings = getSettings();
-    return s + (settings.palletL * settings.palletW * p.totalHeight / 1728);
-  }, 0);
+  const settings = getSettings();
+  const totalVolume = pallets.reduce((s, p) =>
+    s + (settings.palletL * settings.palletW * p.totalHeight / 1728), 0);
   const warnings = pallets.filter(p => p.overHeight).length;
 
   document.getElementById('st-pallets').textContent = pallets.length;
@@ -918,16 +1028,26 @@ function renderSKUSummary(skus, settings, pallets) {
     <thead><tr>
       <th>Color</th><th>SKU</th><th>Description</th>
       <th class="num">L×W×H (in)</th>
-      <th class="num">Boxes/Layer</th>
+      <th class="num">Best BPL</th>
+      <th class="num">Orient Used</th>
       <th class="num">Qty (ctns)</th>
       <th class="num">Sell Price</th>
       <th class="num">Unit Cost</th>
       <th class="num">Total Sell $</th>
       <th class="num">Total COGS $</th>
     </tr></thead><tbody>`;
+
+  // Use skuData from lastResult so we can show the orientation chosen
+  const skuDataMap = {};
+  if (lastResult && lastResult.skuData) {
+    lastResult.skuData.forEach(sd => { skuDataMap[sd.sku] = sd; });
+  }
+
   skus.forEach((s, i) => {
     const color = SKU_COLORS[i % SKU_COLORS.length];
-    const bpl = computeBoxesPerLayer(s.l, s.w, settings.palletL, settings.palletW);
+    const bpl = computeBoxesPerLayerDisplay(s.l, s.w, s.h, settings.palletL, settings.palletW);
+    const sd = skuDataMap[s.sku];
+    const orientLabel = sd ? sd.orientLabel : '—';
     const totalSell = s.qty * s.units * s.sell;
     const totalCogs = s.qty * s.units * s.cost;
     html += `<tr>
@@ -936,6 +1056,7 @@ function renderSKUSummary(skus, settings, pallets) {
       <td>${esc(s.desc)}</td>
       <td class="num">${s.l}×${s.w}×${s.h}</td>
       <td class="num">${bpl > 0 ? bpl : '<span style="color:var(--red)">⚠ Oversized</span>'}</td>
+      <td class="num" style="font-size:11px;color:var(--gray-500);">${esc(orientLabel)}</td>
       <td class="num">${s.qty}</td>
       <td class="num">$${fmtNum(s.sell,2)}</td>
       <td class="num">$${fmtNum(s.cost,2)}</td>
@@ -952,13 +1073,14 @@ function renderSKUSummary(skus, settings, pallets) {
 // RENDER: PALLET CARDS
 // ─────────────────────────────────────────────────────────────────────
 function renderPallets(pallets, settings, skus) {
+  manualModes = {}; // reset manual state on new optimization
   const grid = document.getElementById('palletGrid');
   grid.innerHTML = '';
   pallets.forEach((p, i) => {
-    grid.appendChild(createPalletCard(p, i + 1, settings));
+    const card = createPalletCard(p, i + 1, settings, i);
+    grid.appendChild(card);
   });
 
-  // Legend
   const legend = document.getElementById('skuLegend');
   legend.innerHTML = skus.map((s, i) =>
     `<div class="legend-item">
@@ -970,36 +1092,63 @@ function renderPallets(pallets, settings, skus) {
   document.getElementById('palletResultsSection').style.display = '';
 }
 
-function createPalletCard(pallet, num, settings) {
+function rerenderPalletCard(palletIdx) {
+  if (!lastResult) return;
+  const pallet = lastResult.pallets[palletIdx];
+  const settings = getSettings();
+  const grid = document.getElementById('palletGrid');
+  const existing = grid.querySelector(`[data-pallet-idx="${palletIdx}"]`);
+  if (!existing) return;
+  const newCard = createPalletCard(pallet, palletIdx + 1, settings, palletIdx);
+  existing.replaceWith(newCard);
+}
+
+function createPalletCard(pallet, num, settings, palletIdx) {
   const card = document.createElement('div');
   card.className = 'pallet-card';
+  card.dataset.palletIdx = palletIdx;
 
-  const vol = settings.palletL * settings.palletW * pallet.totalHeight / 1728;
+  // Use manual-mode layers if active
+  const mm = manualModes[palletIdx];
+  const displayLayers = (mm && mm.enabled) ? mm.layers : pallet.layers;
+
+  // Recompute heights/stats from display layers (may differ in manual mode)
+  const displayTotalH = displayLayers.reduce((s, l) => s + l.heightIn, 0);
+  const displayReportedH = displayTotalH + settings.palletBoardH;
+  const displayOverH = displayReportedH > settings.maxHeight;
+
+  const vol = settings.palletL * settings.palletW * displayTotalH / 1728;
   const density = vol > 0 ? pallet.totalWeight / vol : 0;
   const fc = getFreightClass(density);
-  const overH = pallet.overHeight;
-  const reportedH = pallet.reportedHeight; // boxes + pallet board
+  const isManual = mm && mm.enabled;
+  const debugOn = document.getElementById('debugMode').checked;
 
   // Header
   let headerHTML = `<div class="pallet-card-header">
-    <div>
-      <div class="pallet-num">Pallet ${num}</div>
-      <div class="pallet-ht ${overH ? 'over' : ''}">${fmtNum(reportedH,1)}" total (${fmtNum(pallet.totalHeight,1)}" boxes + ${settings.palletBoardH}" board) / ${settings.maxHeight}"</div>
+    <div class="pallet-info">
+      <div class="pallet-num">Pallet ${num}${isManual ? ' <span style="font-size:11px;color:#C4B5FD;">[MANUAL]</span>' : ''}</div>
+      <div class="pallet-ht ${displayOverH ? 'over' : ''}">${fmtNum(displayReportedH,1)}" total (${fmtNum(displayTotalH,1)}" boxes + ${settings.palletBoardH}" board) / ${settings.maxHeight}"</div>
     </div>
-    <div>${overH ? '<span class="warn-badge">&#9888; HEIGHT</span>' : '<span style="font-size:18px;">&#10003;</span>'}</div>
+    <div class="pallet-card-actions">
+      ${displayOverH ? '<span class="warn-badge">&#9888; HEIGHT</span>' : '<span style="font-size:16px;color:#6EE7B7;">&#10003;</span>'}
+      <button class="btn btn-manual btn-sm btn-xs${isManual ? ' active' : ''}"
+        onclick="toggleManualMode(${palletIdx})" title="Toggle manual drag-and-drop mode">
+        &#10021; Manual
+      </button>
+    </div>
   </div>`;
 
   // Stats 2×2
   let statsHTML = `<div class="pallet-stats">
     <div class="pallet-stat">
       <div class="ps-label">Height</div>
-      <div class="ps-value" style="color:${overH?'var(--red)':'var(--navy)'};">${fmtNum(pallet.totalHeight,1)}</div>
+      <div class="ps-value" style="color:${displayOverH?'var(--red)':'var(--navy)'};">${fmtNum(displayTotalH,1)}</div>
       <div class="ps-unit">inches</div>
     </div>
     <div class="pallet-stat">
       <div class="ps-label">Weight</div>
       <div class="ps-value">${fmtNum(pallet.totalWeight,0)}</div>
-      <div class="ps-unit">lbs</div>
+      <div class="ps-unit">lbs${settings.maxPalletWeight > 0 ? ' / ' + settings.maxPalletWeight : ''}</div>
     </div>
     <div class="pallet-stat">
       <div class="ps-label">Volume</div>
@@ -1013,132 +1162,289 @@ function createPalletCard(pallet, num, settings) {
     </div>
   </div>`;
 
-  // Freight class
   let freightHTML = `<div class="freight-row">
     <span class="fc-label">NMFC FREIGHT CLASS</span>
     <span class="fc-value">${fc}</span>
   </div>`;
 
   // Layer table
+  let layerTableHTML = buildLayerTableHTML(displayLayers, palletIdx, isManual);
+
+  // Manual mode bar
+  let manualBarHTML = '';
+  if (isManual) {
+    manualBarHTML = `<div class="manual-mode-bar">
+      <span class="mm-label">&#10021; Manual Mode — drag rows to reorder layers</span>
+      <button class="btn btn-ghost btn-sm btn-xs" onclick="resetManualMode(${palletIdx})">&#8635; Reset to Optimized</button>
+    </div>`;
+  }
+
+  // SVG viz — uses display layers
+  const vizPallet = { ...pallet, layers: displayLayers, totalHeight: displayTotalH, reportedHeight: displayReportedH, overHeight: displayOverH };
+  let vizHTML = `<div class="pallet-viz">${createPalletViz(vizPallet, settings)}</div>`;
+
+  // Debug panel
+  let debugHTML = debugOn ? buildDebugPanel(pallet, displayLayers, settings) : '';
+
+  card.innerHTML = headerHTML + statsHTML + freightHTML + manualBarHTML + layerTableHTML + vizHTML + debugHTML;
+  return card;
+}
+
+function buildLayerTableHTML(layers, palletIdx, isManual) {
   let layerRows = '';
-  pallet.layers.forEach((layer, li) => {
+  layers.forEach((layer, li) => {
     const chips = layer.segments
       ? layer.segments.map(seg =>
           `<span class="layer-sku-chip" style="background:${seg.color};">${esc(seg.sku)} ×${seg.count}</span>`
         ).join('')
       : `<span class="layer-sku-chip" style="background:${layer.color};">${esc(layer.sku)} ×${layer.count}</span>`;
-    layerRows += `<tr>
-      <td style="color:var(--gray-500);font-size:11px;">L${li+1}</td>
-      <td style="font-size:11px;">${fmtNum(layer.heightIn,1)}"</td>
+
+    const dragAttrs = isManual
+      ? `draggable="true" class="manual-row"
+         ondragstart="onLayerDragStart(event,${palletIdx},${li})"
+         ondragover="onLayerDragOver(event,${palletIdx},${li})"
+         ondragleave="onLayerDragLeave(event)"
+         ondrop="onLayerDrop(event,${palletIdx},${li})"
+         ondragend="onLayerDragEnd(event)"`
+      : '';
+
+    const handleCell = isManual
+      ? `<td><span class="drag-handle" title="Drag to reorder">&#8801;</span></td>`
+      : '';
+
+    layerRows += `<tr ${dragAttrs}>
+      ${handleCell}
+      <td style="color:var(--gray-500);font-size:11px;white-space:nowrap;">L${li+1}</td>
+      <td style="font-size:11px;white-space:nowrap;">${fmtNum(layer.heightIn,1)}"</td>
       <td>${chips}</td>
     </tr>`;
   });
-  let layerTableHTML = `<div class="layer-table-wrap">
+
+  const extraTh = isManual ? '<th style="width:22px;"></th>' : '';
+  return `<div class="layer-table-wrap">
     <table class="layer-table">
-      <thead><tr><th>Lyr</th><th>Ht</th><th>Contents</th></tr></thead>
+      <thead><tr>${extraTh}<th>Lyr</th><th>Ht</th><th>Contents</th></tr></thead>
       <tbody>${layerRows}</tbody>
     </table>
   </div>`;
-
-  // SVG viz
-  let vizHTML = `<div class="pallet-viz">${createPalletViz(pallet, settings)}</div>`;
-
-  card.innerHTML = headerHTML + statsHTML + freightHTML + layerTableHTML + vizHTML;
-  return card;
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// SVG PALLET VISUALIZATION
+// DEBUG PANEL
+// ─────────────────────────────────────────────────────────────────────
+function buildDebugPanel(pallet, displayLayers, settings) {
+  const { maxHeight, palletBoardH, palletWeight, maxPalletWeight } = settings;
+  const stackLimit = maxHeight - palletBoardH;
+
+  // SKU orientations from lastResult
+  const skuOrients = {};
+  if (lastResult && lastResult.skuData) {
+    lastResult.skuData.forEach(sd => {
+      skuOrients[sd.idx] = sd;
+    });
+  }
+
+  let lines = [];
+  lines.push(`<span class="dbg-head">═══ PALLET DEBUG ═══</span>`);
+  lines.push(`<span class="dbg-dim">Usable stacking height: ${stackLimit}" (${maxHeight}" max − ${palletBoardH}" board)</span>`);
+  lines.push(`<span class="dbg-dim">Max pallet weight: ${maxPalletWeight > 0 ? maxPalletWeight + ' lbs' : 'none'}</span>`);
+  lines.push(`<span class="dbg-dim">Empty pallet: ${palletWeight} lbs</span>`);
+  lines.push('');
+
+  let cumH = 0;
+  let cumWt = palletWeight;
+
+  displayLayers.forEach((layer, i) => {
+    cumH += layer.heightIn;
+    const layerWt = (layer.segments || []).reduce((s, seg) => {
+      const sd = skuOrients[seg.skuIdx];
+      return s + (sd ? sd.wt * seg.count : 0);
+    }, 0);
+    cumWt += layerWt;
+
+    const totalStackedH = cumH + palletBoardH;
+    const overH = totalStackedH > maxHeight;
+    const overW = maxPalletWeight > 0 && cumWt > maxPalletWeight;
+
+    const segStr = (layer.segments || []).map(s => {
+      const sd = skuOrients[s.skuIdx];
+      const orient = sd ? `orient:${sd.orientLabel}` : '';
+      return `${s.sku}×${s.count} (${orient}, bpl:${s.bpl})`;
+    }).join(', ');
+
+    lines.push(`<span class="dbg-layer">Layer ${i+1}:</span> ${segStr}`);
+    lines.push(`  layer ht: <b>${layer.heightIn}"</b>  |  cumulative: ${cumH}" + ${palletBoardH}" board = <b>${totalStackedH}"</b> ${overH ? '<span class="dbg-warn">[OVER HEIGHT!]</span>' : '<span class="dbg-ok">[OK]</span>'}`);
+    lines.push(`  layer wt: ${fmtNum(layerWt,1)} lbs  |  pallet wt: <b>${fmtNum(cumWt,1)} lbs</b> ${overW ? '<span class="dbg-warn">[OVER WEIGHT!]</span>' : ''}`);
+    if (layer.fullLayers > 0) {
+      lines.push(`  ${layer.fullLayers} full layer(s) of ${layer.h}" each`);
+    }
+    lines.push('');
+  });
+
+  lines.push(`<span class="dbg-head">TOTALS:</span> ${displayLayers.length} layers | ${fmtNum(cumH,1)}" boxes + ${palletBoardH}" = <b>${fmtNum(cumH + palletBoardH,1)}"</b> total | <b>${fmtNum(cumWt,0)} lbs</b>`);
+
+  return `<div class="debug-panel">${lines.join('\n')}</div>`;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// SVG PALLET VISUALIZATION — auto-scaling height
 // ─────────────────────────────────────────────────────────────────────
 function createPalletViz(pallet, settings) {
-  const W = 220, H = 200;
-  const vizW = 160, vizH = 160;
-  const vizX = 20, vizY = 12;
-  const stackLimit = settings.maxHeight - settings.palletBoardH;
-  const scale = vizH / settings.maxHeight; // px per inch (total height incl. board)
+  const vizX = 20, vizY = 14;
+  const vizW = 165;
   const maxH = settings.maxHeight;
+  const boardH = settings.palletBoardH;
+
+  // Auto-scale: ensure each distinct layer is at least MIN_LAYER_PX pixels tall
+  const MIN_LAYER_PX = 14;
+  const minLayerH = pallet.layers.length > 0
+    ? Math.min(...pallet.layers.map(l => l.heightIn))
+    : maxH;
+  const minScale = minLayerH > 0 ? MIN_LAYER_PX / minLayerH : 2;
+  const naturalScale = 160 / maxH;
+  const scale = Math.max(naturalScale, minScale);
+
+  const vizH = Math.ceil(maxH * scale);
+  const W = vizX + vizW + 36;
+  const H = vizH + vizY + 20;
+
+  const boardPx = boardH * scale;
   const overH = pallet.overHeight;
-  const boardPx = settings.palletBoardH * scale; // pallet board height in pixels
 
   let svg = `<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" xmlns="http://www.w3.org/2000/svg">`;
-
-  // Background
   svg += `<rect x="0" y="0" width="${W}" height="${H}" fill="#F9FAFB" rx="4"/>`;
 
-  // Draw layers from bottom up — boxes sit above the pallet board
-  let yBottom = vizY + vizH - boardPx; // top of board = bottom of box stacking area
-  const totalStackedH = pallet.totalHeight * scale;
+  // Draw layers from bottom up (boxes sit above the pallet board)
+  let yBottom = vizY + vizH - boardPx;
 
   pallet.layers.forEach(layer => {
     const layerPxH = layer.heightIn * scale;
     const yTop = yBottom - layerPxH;
 
     if (layer.segments && layer.segments.length > 1) {
-      // Mixed layer: split width proportionally by box count
       const totalBoxes = layer.segments.reduce((s, sg) => s + sg.count, 0);
       let xLeft = vizX;
       layer.segments.forEach((seg, si) => {
         const segW = Math.round((seg.count / totalBoxes) * vizW);
         svg += `<rect x="${xLeft}" y="${yTop}" width="${segW}" height="${layerPxH}" fill="${seg.color}" opacity="0.88" stroke="#fff" stroke-width="0.5"/>`;
-        if (segW > 28) {
-          svg += `<text x="${xLeft + segW/2}" y="${yTop + layerPxH/2 + 4}" text-anchor="middle" font-size="9" fill="#fff" font-weight="700" clip-path="url(#cp${si})">${esc(seg.sku)}</text>`;
+        if (segW > 24 && layerPxH > 8) {
+          svg += `<text x="${xLeft + segW/2}" y="${yTop + layerPxH/2 + 3}" text-anchor="middle" font-size="8" fill="#fff" font-weight="700">${esc(seg.sku)}</text>`;
         }
         xLeft += segW;
       });
     } else {
       svg += `<rect x="${vizX}" y="${yTop}" width="${vizW}" height="${layerPxH}" fill="${layer.color}" opacity="0.88" stroke="#fff" stroke-width="1"/>`;
-      if (layerPxH > 12) {
-        svg += `<text x="${vizX + vizW/2}" y="${yTop + layerPxH/2 + 4}" text-anchor="middle" font-size="10" fill="#fff" font-weight="700">${esc(layer.sku)}</text>`;
+      if (layerPxH > 10) {
+        svg += `<text x="${vizX + vizW/2}" y="${yTop + layerPxH/2 + 3}" text-anchor="middle" font-size="9" fill="#fff" font-weight="700">${esc(layer.sku)}</text>`;
       }
     }
     yBottom = yTop;
   });
 
-  // Outline for stacking area
+  // Dashed outline for stacking area
   svg += `<rect x="${vizX}" y="${vizY}" width="${vizW}" height="${vizH}" fill="none" stroke="#D1D5DB" stroke-width="1" stroke-dasharray="3,2"/>`;
 
-  // Dashed max-height line
-  const maxLineY = vizY; // top of vizH is maxHeight
+  // Max-height dashed line
   const lineColor = overH ? '#EF4444' : '#10B981';
-  svg += `<line x1="${vizX}" y1="${maxLineY}" x2="${vizX + vizW}" y2="${maxLineY}" stroke="${lineColor}" stroke-width="1.5" stroke-dasharray="5,3"/>`;
-  svg += `<text x="${vizX + vizW + 3}" y="${maxLineY + 4}" font-size="8" fill="${lineColor}" font-weight="700">${maxH}"</text>`;
+  svg += `<line x1="${vizX}" y1="${vizY}" x2="${vizX + vizW}" y2="${vizY}" stroke="${lineColor}" stroke-width="1.5" stroke-dasharray="5,3"/>`;
+  svg += `<text x="${vizX + vizW + 3}" y="${vizY + 4}" font-size="8" fill="${lineColor}" font-weight="700">${maxH}"</text>`;
 
-  // Pallet board — drawn INSIDE the 72" viz zone at the bottom, represents the full 5"
+  // Pallet board
   const boardY = vizY + vizH - boardPx;
-  // Top deck plank
   const deckH = Math.max(3, boardPx * 0.35);
   svg += `<rect x="${vizX}" y="${boardY}" width="${vizW}" height="${deckH}" fill="#8B5E3C" rx="1"/>`;
-  // Plank lines on top deck
   for (let px = vizX + vizW * 0.25; px < vizX + vizW; px += vizW * 0.25) {
     svg += `<line x1="${px}" y1="${boardY}" x2="${px}" y2="${boardY + deckH}" stroke="#6B4423" stroke-width="0.75"/>`;
   }
-  // Legs/blocks inside the 5" zone
   const legH2 = boardPx - deckH;
-  const legW2 = vizW * 0.22;
-  const legPositions = [vizX, vizX + vizW / 2 - legW2 / 2, vizX + vizW - legW2];
-  legPositions.forEach(lx => {
-    svg += `<rect x="${lx}" y="${boardY + deckH}" width="${legW2}" height="${legH2}" fill="#6B4423" rx="1"/>`;
-  });
-  // Bottom deck plank
+  if (legH2 > 0) {
+    const legW2 = vizW * 0.22;
+    const legPositions = [vizX, vizX + vizW / 2 - legW2 / 2, vizX + vizW - legW2];
+    legPositions.forEach(lx => {
+      svg += `<rect x="${lx}" y="${boardY + deckH}" width="${legW2}" height="${legH2}" fill="#6B4423" rx="1"/>`;
+    });
+  }
   const bottomDeckH = Math.max(2, deckH * 0.75);
   svg += `<rect x="${vizX}" y="${vizY + vizH - bottomDeckH}" width="${vizW}" height="${bottomDeckH}" fill="#8B5E3C" rx="1"/>`;
   if (boardPx > 10) {
-    svg += `<text x="${vizX + vizW/2}" y="${boardY + boardPx/2 + 3}" text-anchor="middle" font-size="7" fill="#fff" font-weight="600">${settings.palletBoardH}" board</text>`;
+    svg += `<text x="${vizX + vizW/2}" y="${boardY + boardPx/2 + 3}" text-anchor="middle" font-size="7" fill="#fff" font-weight="600">${boardH}" board</text>`;
   }
 
-  // Height annotation on right (spans from top of boxes down to floor)
+  // Height annotation on right
+  const totalStackedH = pallet.totalHeight * scale;
   const annotX = vizX + vizW + 16;
   if (totalStackedH > 0) {
-    const topY = vizY + vizH - boardPx - totalStackedH; // top of boxes (above board)
+    const topY = vizY + vizH - boardPx - totalStackedH;
     svg += `<line x1="${annotX}" y1="${topY}" x2="${annotX}" y2="${vizY + vizH}" stroke="#6B7280" stroke-width="1"/>`;
-    svg += `<line x1="${annotX - 3}" y1="${topY}" x2="${annotX + 3}" y2="${topY}" stroke="#6B7280" stroke-width="1"/>`;
-    svg += `<line x1="${annotX - 3}" y1="${vizY+vizH}" x2="${annotX + 3}" y2="${vizY+vizH}" stroke="#6B7280" stroke-width="1"/>`;
+    svg += `<line x1="${annotX-3}" y1="${topY}" x2="${annotX+3}" y2="${topY}" stroke="#6B7280" stroke-width="1"/>`;
+    svg += `<line x1="${annotX-3}" y1="${vizY+vizH}" x2="${annotX+3}" y2="${vizY+vizH}" stroke="#6B7280" stroke-width="1"/>`;
     const midY = (topY + vizY + vizH) / 2;
-    svg += `<text x="${annotX + 6}" y="${midY + 4}" font-size="9" fill="${overH?'#EF4444':'#374151'}" font-weight="700">${fmtNum(pallet.reportedHeight,0)}"</text>`;
+    svg += `<text x="${annotX + 5}" y="${midY + 4}" font-size="9" fill="${overH?'#EF4444':'#374151'}" font-weight="700">${fmtNum(pallet.reportedHeight,0)}"</text>`;
   }
 
   svg += '</svg>';
   return svg;
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// MANUAL MODE (TETRIS) — drag-and-drop layer reordering
+// ─────────────────────────────────────────────────────────────────────
+function toggleManualMode(palletIdx) {
+  if (!lastResult) return;
+  if (!manualModes[palletIdx]) {
+    // Initialize manual state — deep copy the pallet's current layers
+    const original = JSON.parse(JSON.stringify(lastResult.pallets[palletIdx].layers));
+    manualModes[palletIdx] = { enabled: true, layers: JSON.parse(JSON.stringify(original)), original };
+  } else {
+    manualModes[palletIdx].enabled = !manualModes[palletIdx].enabled;
+  }
+  rerenderPalletCard(palletIdx);
+}
+
+function resetManualMode(palletIdx) {
+  if (!manualModes[palletIdx]) return;
+  manualModes[palletIdx].layers = JSON.parse(JSON.stringify(manualModes[palletIdx].original));
+  manualModes[palletIdx].enabled = true;
+  rerenderPalletCard(palletIdx);
+}
+
+function onLayerDragStart(e, palletIdx, layerIdx) {
+  dragState.fromPalletIdx = palletIdx;
+  dragState.fromLayerIdx = layerIdx;
+  e.dataTransfer.effectAllowed = 'move';
+  e.currentTarget.classList.add('dragging');
+}
+
+function onLayerDragOver(e, palletIdx, layerIdx) {
+  if (dragState.fromPalletIdx !== palletIdx) return;
+  e.preventDefault();
+  e.dataTransfer.dropEffect = 'move';
+  e.currentTarget.classList.add('drag-over');
+}
+
+function onLayerDragLeave(e) {
+  e.currentTarget.classList.remove('drag-over');
+}
+
+function onLayerDrop(e, palletIdx, layerIdx) {
+  e.preventDefault();
+  e.currentTarget.classList.remove('drag-over');
+  if (dragState.fromPalletIdx !== palletIdx) return;
+  const from = dragState.fromLayerIdx;
+  const to = layerIdx;
+  if (from === to) return;
+
+  const layers = manualModes[palletIdx].layers;
+  const [moved] = layers.splice(from, 1);
+  layers.splice(to, 0, moved);
+  rerenderPalletCard(palletIdx);
+}
+
+function onLayerDragEnd(e) {
+  document.querySelectorAll('.layer-table tr').forEach(tr => {
+    tr.classList.remove('dragging', 'drag-over');
+  });
+  dragState = { fromPalletIdx: null, fromLayerIdx: null };
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -1147,7 +1453,6 @@ function createPalletViz(pallet, settings) {
 function renderFinancials(skus, settings, pallets) {
   const referral = settings.referralFee / 100;
   const fba = settings.fbaFee / 100;
-
   const totalSell = skus.reduce((s, x) => s + x.qty * x.units * x.sell, 0);
   const amazonFees = totalSell * (referral + fba);
   const totalCOGS = skus.reduce((s, x) => s + x.qty * x.units * x.cost, 0);
@@ -1160,8 +1465,7 @@ function renderFinancials(skus, settings, pallets) {
   const totalPallets = pallets.length;
   const totalWeight = pallets.reduce((s, p) => s + p.totalWeight, 0);
 
-  const wrap = document.getElementById('financialsWrap');
-  wrap.innerHTML = `
+  document.getElementById('financialsWrap').innerHTML = `
   <div class="financials-grid">
     <div class="fin-block">
       <h3>Revenue Breakdown</h3>
@@ -1188,14 +1492,8 @@ function renderFinancials(skus, settings, pallets) {
     </div>
     <div class="fin-block">
       <h3>Shipment Valuation &amp; Summary</h3>
-      <div class="fin-row">
-        <span class="fin-label">Declared Value (COGS)</span>
-        <span class="fin-val fw-bold">$${fmtNum(totalCOGS,2)}</span>
-      </div>
-      <div class="fin-row">
-        <span class="fin-label">Insured Value (Sell Value)</span>
-        <span class="fin-val fw-bold">$${fmtNum(totalSell,2)}</span>
-      </div>
+      <div class="fin-row"><span class="fin-label">Declared Value (COGS)</span><span class="fin-val fw-bold">$${fmtNum(totalCOGS,2)}</span></div>
+      <div class="fin-row"><span class="fin-label">Insured Value (Sell Value)</span><span class="fin-val fw-bold">$${fmtNum(totalSell,2)}</span></div>
       <div class="fin-row"><span class="fin-label">Total Pallets</span><span class="fin-val">${totalPallets}</span></div>
       <div class="fin-row"><span class="fin-label">Total Shipment Weight</span><span class="fin-val">${fmtNum(totalWeight,0)} lbs</span></div>
       <div class="fin-row"><span class="fin-label">Avg Weight per Pallet</span><span class="fin-val">${totalPallets > 0 ? fmtNum(totalWeight/totalPallets,0) : '—'} lbs</span></div>
@@ -1241,43 +1539,32 @@ function updateCarrierCalc(idx) {
   const totalPallets = lastResult ? lastResult.pallets.length : 0;
   const totalWeight  = lastResult ? lastResult.pallets.reduce((s, p) => s + p.totalWeight, 0) : 0;
 
-  if (type === 'cwt') {
-    totalCost = rate * (totalWeight / 100) * fuelMult;
-  } else if (type === 'flatpallet') {
-    totalCost = rate * totalPallets * fuelMult;
-  } else if (type === 'total') {
-    totalCost = rate * fuelMult;
-  }
+  if (type === 'cwt')       totalCost = rate * (totalWeight / 100) * fuelMult;
+  else if (type === 'flatpallet') totalCost = rate * totalPallets * fuelMult;
+  else if (type === 'total')      totalCost = rate * fuelMult;
 
   const perPallet = totalPallets > 0 ? totalCost / totalPallets : 0;
   document.getElementById(`ctotal-${idx}`).textContent  = totalCost  > 0 ? `$${fmtNum(totalCost,2)}`  : '—';
   document.getElementById(`cperpal-${idx}`).textContent = perPallet  > 0 ? `$${fmtNum(perPallet,2)}` : '—';
-
   highlightBestCarrier();
 }
 
 function highlightBestCarrier() {
   const rows = document.querySelectorAll('#carrierTbody tr');
   let bestVal = Infinity, bestIdx = -1;
-
   rows.forEach((tr, i) => {
-    const totalEl = document.getElementById(`ctotal-${i}`);
-    const txt = totalEl.textContent;
+    const txt = document.getElementById(`ctotal-${i}`).textContent;
     if (txt === '—') return;
     const val = parseFloat(txt.replace(/[$,]/g,''));
     if (!isNaN(val) && val > 0 && val < bestVal) { bestVal = val; bestIdx = i; }
   });
-
   rows.forEach((tr, i) => {
     tr.classList.remove('best-row');
-    const nameEl = document.getElementById(`cn-${i}`);
-    nameEl.innerHTML = esc(CARRIERS[i]);
+    document.getElementById(`cn-${i}`).innerHTML = esc(CARRIERS[i]);
   });
-
   if (bestIdx >= 0) {
     rows[bestIdx].classList.add('best-row');
-    document.getElementById(`cn-${bestIdx}`).innerHTML =
-      esc(CARRIERS[bestIdx]) + '<span class="best-badge">BEST</span>';
+    document.getElementById(`cn-${bestIdx}`).innerHTML = esc(CARRIERS[bestIdx]) + '<span class="best-badge">BEST</span>';
   }
 }
 
@@ -1291,8 +1578,6 @@ function runOptimizer() {
     return;
   }
   const settings = getSettings();
-
-  // Validate settings
   if (settings.palletL <= 0 || settings.palletW <= 0 || settings.maxHeight <= 0) {
     showStatus('Invalid pallet settings. Please check dimensions.', 'error');
     return;
@@ -1305,11 +1590,8 @@ function runOptimizer() {
   renderSKUSummary(skus, settings, result.pallets);
   renderPallets(result.pallets, settings, skus);
   renderFinancials(skus, settings, result.pallets);
-
-  // Update carrier calcs with new weight/pallet data
   CARRIERS.forEach((_, i) => updateCarrierCalc(i));
 
-  // Status message
   const warnings = result.pallets.filter(p => p.overHeight).length;
   let msg = `Optimization complete: ${result.pallets.length} pallet${result.pallets.length !== 1 ? 's' : ''} created.`;
   if (result.oversized.length > 0) {
@@ -1322,16 +1604,95 @@ function runOptimizer() {
     showStatus(msg, 'success');
   }
 
-  // Scroll to results
   document.getElementById('skuSummarySection').scrollIntoView({ behavior: 'smooth', block: 'start' });
 }
 
-function renderResults(pallets, skus, settings) {
-  // Wrapper — called internally; individual render functions used directly
+// ─────────────────────────────────────────────────────────────────────
+// SHAREABLE URL — encode/decode form state into URL hash
+// ─────────────────────────────────────────────────────────────────────
+function copyShareableLink() {
+  try {
+    const state = {
+      skus: getAllFormRows(),
+      settings: {
+        palletL:         document.getElementById('palletL').value,
+        palletW:         document.getElementById('palletW').value,
+        maxHeight:       document.getElementById('maxHeight').value,
+        palletBoardH:    document.getElementById('palletBoardH').value,
+        palletWeight:    document.getElementById('palletWeight').value,
+        maxPalletWeight: document.getElementById('maxPalletWeight').value,
+        referralFee:     document.getElementById('referralFee').value,
+        fbaFee:          document.getElementById('fbaFee').value,
+      }
+    };
+    const encoded = encodeURIComponent(JSON.stringify(state));
+    const url = location.href.split('#')[0] + '#s=' + encoded;
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(url).then(() => {
+        showStatus('✓ Shareable link copied to clipboard! Paste it to share your current setup with Dean or anyone else.', 'success');
+      }).catch(() => fallbackCopy(url));
+    } else {
+      fallbackCopy(url);
+    }
+  } catch(e) {
+    showStatus('Could not generate link: ' + e.message, 'error');
+  }
+}
+
+function fallbackCopy(url) {
+  const ta = document.createElement('textarea');
+  ta.value = url;
+  ta.style.position = 'fixed'; ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  document.body.removeChild(ta);
+  showStatus('✓ Shareable link copied! Paste it to share your current setup.', 'success');
+}
+
+function loadFromURL() {
+  try {
+    const hash = location.hash;
+    if (!hash || !hash.startsWith('#s=')) return;
+    const encoded = hash.slice(3);
+    const state = JSON.parse(decodeURIComponent(encoded));
+
+    // Restore settings
+    if (state.settings) {
+      const s = state.settings;
+      const setVal = (id, v) => { const el = document.getElementById(id); if (el && v !== undefined) el.value = v; };
+      setVal('palletL', s.palletL);
+      setVal('palletW', s.palletW);
+      setVal('maxHeight', s.maxHeight);
+      setVal('palletBoardH', s.palletBoardH);
+      setVal('palletWeight', s.palletWeight);
+      setVal('maxPalletWeight', s.maxPalletWeight);
+      setVal('referralFee', s.referralFee);
+      setVal('fbaFee', s.fbaFee);
+    }
+
+    // Restore SKU rows
+    if (state.skus && state.skus.length > 0) {
+      document.getElementById('skuTbody').innerHTML = '';
+      skuRowCount = 0;
+      state.skus.forEach(row => {
+        addSKURow({
+          sku: row.sku, desc: row.desc,
+          l: row.l, w: row.w, h: row.h,
+          wt: row.wt, qty: row.qty,
+          sell: row.sell, cost: row.cost, units: row.units
+        });
+      });
+      showStatus('✓ Loaded saved setup from URL. Click Optimize Pallets to run.', 'success');
+    }
+  } catch(e) {
+    // Silently ignore malformed URL state
+    console.warn('Could not restore URL state:', e);
+  }
 }
 
 // ─────────────────────────────────────────────────────────────────────
-// SAMPLE DATA
+// SAMPLE DATA / CLEAR
 // ─────────────────────────────────────────────────────────────────────
 function loadSampleData() {
   clearAll();
@@ -1348,17 +1709,16 @@ function loadSampleData() {
 function clearAll() {
   document.getElementById('skuTbody').innerHTML = '';
   skuRowCount = 0;
+  lastResult = null;
+  manualModes = {};
   document.getElementById('statusMsg').className = 'status-msg';
   document.getElementById('statusMsg').style.display = 'none';
   document.getElementById('palletResultsSection').style.display = 'none';
   document.getElementById('skuSummarySection').style.display = 'none';
   document.getElementById('financialsSection').style.display = 'none';
-  document.getElementById('st-pallets').textContent = '—';
-  document.getElementById('st-warnings').textContent = '—';
-  document.getElementById('st-weight').textContent = '—';
-  document.getElementById('st-volume').textContent = '—';
-  document.getElementById('st-skus').textContent = '—';
-  lastResult = null;
+  ['st-pallets','st-warnings','st-weight','st-volume','st-skus'].forEach(id => {
+    document.getElementById(id).textContent = '—';
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -1366,13 +1726,12 @@ function clearAll() {
 // ─────────────────────────────────────────────────────────────────────
 function toggleSection(header) {
   header.classList.toggle('collapsed');
-  const body = header.nextElementSibling;
-  body.classList.toggle('hidden');
+  header.nextElementSibling.classList.toggle('hidden');
 }
 
 function showStatus(msg, type) {
   const el = document.getElementById('statusMsg');
-  el.textContent = msg;
+  el.innerHTML = msg;
   el.className = `status-msg ${type}`;
 }
 
@@ -1415,28 +1774,22 @@ function runImport() {
 
   for (let i = 0; i < rows.length; i++) {
     const cols = rows[i].map(c => c.trim());
-    // Skip completely blank rows or header-looking rows
     if (!cols[0] || cols[0].toLowerCase() === 'sku' || cols[0].toLowerCase() === 'item') continue;
-
-    // Expected columns (tab-separated, 7 cols):
-    // SKU | Box Dims (LxWxH) | Qty | Weight | Units/Box | Sell$ | Cost$
     if (cols.length < 4) { errEl.textContent = `Row ${i+1}: not enough columns (got ${cols.length}, need 7). Check format.`; return; }
 
     const sku   = cols[0];
-    const dims  = cols[1]; // e.g. "19.5x15.75x10.5" or "20x15x12.5"
+    const dims  = cols[1];
     const qty   = parseFloat(cols[2]);
     const wt    = parseFloat(cols[3]);
     const units = parseFloat(cols[4]) || 1;
     const sell  = parseFloat(cols[5]) || 0;
     const cost  = parseFloat(cols[6]) || 0;
 
-    // Parse dims — split on "x" or "X", handle decimals
     const dimParts = dims.split(/x/i).map(d => parseFloat(d.trim()));
     if (dimParts.length < 3 || dimParts.some(isNaN)) {
       errEl.textContent = `Row ${i+1} (${sku}): can't parse dims "${dims}". Use format like 19.5x15.75x10.5`;
       return;
     }
-
     if (isNaN(qty) || qty <= 0) { errEl.textContent = `Row ${i+1} (${sku}): invalid qty "${cols[2]}"`; return; }
     if (isNaN(wt)  || wt  <= 0) { errEl.textContent = `Row ${i+1} (${sku}): invalid weight "${cols[3]}"`; return; }
 
@@ -1445,7 +1798,6 @@ function runImport() {
 
   if (parsed.length === 0) { errEl.textContent = 'No valid rows found. Check your format.'; return; }
 
-  // Clear existing rows and load imported data
   document.getElementById('skuTbody').innerHTML = '';
   skuRowCount = 0;
   parsed.forEach(s => addSKURow(s));
