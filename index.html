@@ -1205,7 +1205,7 @@ function createPalletCard(pallet, num, settings, palletIdx) {
   let manualBarHTML = '';
   if (isManual) {
     manualBarHTML = `<div class="manual-mode-bar">
-      <span class="mm-label">&#10021; Manual Mode — drag rows to reorder layers</span>
+      <span class="mm-label">&#10021; Manual Mode — drag boxes to reorder</span>
       <button class="btn btn-ghost btn-sm btn-xs" onclick="resetManualMode(${palletIdx})">&#8635; Reset to Optimized</button>
     </div>`;
   }
@@ -1230,14 +1230,18 @@ function buildLayerTableHTML(layers, palletIdx, isManual) {
         ).join('')
       : `<span class="layer-sku-chip" style="background:${layer.color};">${esc(layer.sku)} ×${layer.count}</span>`;
 
+    // Drop handlers on every layer row so cross-pallet segment drops work
+    // even when this pallet's manual mode is not yet active.
+    const crossDropAttrs = `ondragover="onLayerDragOver(event,${palletIdx},${li})"
+         ondragleave="onLayerDragLeave(event)"
+         ondrop="onLayerDrop(event,${palletIdx},${li})"`;
+
     const dragAttrs = isManual
       ? `draggable="true" class="manual-row"
          ondragstart="onLayerDragStart(event,${palletIdx},${li})"
-         ondragover="onLayerDragOver(event,${palletIdx},${li})"
-         ondragleave="onLayerDragLeave(event)"
-         ondrop="onLayerDrop(event,${palletIdx},${li})"
+         ${crossDropAttrs}
          ondragend="onLayerDragEnd(event)"`
-      : '';
+      : crossDropAttrs;
 
     const handleCell = isManual
       ? `<td><span class="drag-handle" title="Drag to reorder">&#8801;</span></td>`
@@ -1263,7 +1267,7 @@ function buildLayerTableHTML(layers, palletIdx, isManual) {
           <td><span class="seg-drag-handle" title="Drag to move to another layer">&#8942;&#8942;</span></td>
           <td colspan="3">
             <span class="layer-sku-chip" style="background:${seg.color};">${esc(seg.sku)} ×${seg.count}</span>
-            <span style="font-size:10px;color:var(--gray-500);margin-left:4px;">drag to layer</span>
+            <span style="font-size:10px;color:var(--gray-500);margin-left:4px;">drag to reorder</span>
           </td>
         </tr>`;
       });
@@ -1468,10 +1472,11 @@ function onLayerDragStart(e, palletIdx, layerIdx) {
 }
 
 function onLayerDragOver(e, palletIdx, layerIdx) {
-  if (dragState.fromPalletIdx !== palletIdx) return;
+  // Layer drags are same-pallet only; segment drags accept cross-pallet
+  if (dragState.dragType !== 'segment' && dragState.fromPalletIdx !== palletIdx) return;
+  if (dragState.dragType === null) return; // nothing being dragged
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
-  // FIX 2: different highlight colour for segment-onto-layer drops
   if (dragState.dragType === 'segment') {
     e.currentTarget.classList.add('drag-over-seg');
   } else {
@@ -1486,19 +1491,23 @@ function onLayerDragLeave(e) {
 function onLayerDrop(e, palletIdx, layerIdx) {
   e.preventDefault();
   e.currentTarget.classList.remove('drag-over', 'drag-over-seg');
-  if (dragState.fromPalletIdx !== palletIdx) return;
 
-  // FIX 2: route to segment-drop handler when dragging a segment
   if (dragState.dragType === 'segment') {
-    onSegDrop(palletIdx, dragState.fromLayerIdx, dragState.fromSegIdx, layerIdx);
+    if (dragState.fromPalletIdx === palletIdx) {
+      // Same-pallet segment drop — existing logic
+      onSegDrop(palletIdx, dragState.fromLayerIdx, dragState.fromSegIdx, layerIdx);
+    } else {
+      // Cross-pallet segment drop — new logic
+      onSegDropCross(dragState.fromPalletIdx, dragState.fromLayerIdx, dragState.fromSegIdx, palletIdx, layerIdx);
+    }
     return;
   }
 
-  // Existing layer-reorder logic (unchanged)
+  // Layer-reorder: same-pallet only (unchanged)
+  if (dragState.fromPalletIdx !== palletIdx) return;
   const from = dragState.fromLayerIdx;
   const to = layerIdx;
   if (from === to) return;
-
   const layers = manualModes[palletIdx].layers;
   const [moved] = layers.splice(from, 1);
   layers.splice(to, 0, moved);
@@ -1567,6 +1576,59 @@ function onSegDrop(palletIdx, fromLayerIdx, fromSegIdx, toLayerIdx) {
   destLayer.mixed = destLayer.segments.length > 1;
 
   rerenderPalletCard(palletIdx);
+}
+
+function onSegDropCross(fromPalletIdx, fromLayerIdx, fromSegIdx, toPalletIdx, toLayerIdx) {
+  // Ensure manual mode is initialised on both pallets so we have mutable layer arrays
+  const ensureManual = (pIdx) => {
+    if (!manualModes[pIdx]) {
+      const orig = JSON.parse(JSON.stringify(lastResult.pallets[pIdx].layers));
+      manualModes[pIdx] = { enabled: true, layers: JSON.parse(JSON.stringify(orig)), original: orig };
+    }
+  };
+  ensureManual(fromPalletIdx);
+  ensureManual(toPalletIdx);
+
+  const fromMM = manualModes[fromPalletIdx];
+  const toMM   = manualModes[toPalletIdx];
+
+  const fromLayer = fromMM.layers[fromLayerIdx];
+  if (!fromLayer || !fromLayer.segments || !fromLayer.segments[fromSegIdx]) return;
+
+  const movingSeg = JSON.parse(JSON.stringify(fromLayer.segments[fromSegIdx]));
+
+  // Remove from source layer; drop the layer entirely if it empties
+  fromLayer.segments.splice(fromSegIdx, 1);
+  fromLayer.count = fromLayer.segments.reduce((s, sg) => s + sg.count, 0);
+  fromLayer.mixed = fromLayer.segments.length > 1;
+  if (fromLayer.segments.length === 0) {
+    fromMM.layers.splice(fromLayerIdx, 1);
+  }
+
+  // Add to destination layer (merge if SKU already present)
+  const destLayer = toMM.layers[toLayerIdx];
+  if (!destLayer) { rerenderPalletCard(fromPalletIdx); return; }
+
+  const existing = destLayer.segments
+    ? destLayer.segments.find(s => s.skuIdx === movingSeg.skuIdx)
+    : null;
+  if (existing) {
+    existing.count += movingSeg.count;
+  } else {
+    if (!destLayer.segments) {
+      destLayer.segments = [{ skuIdx: destLayer.skuIdx, sku: destLayer.sku,
+                               color: destLayer.color, count: destLayer.count, bpl: 0 }];
+    }
+    destLayer.segments.push(movingSeg);
+  }
+  destLayer.count = destLayer.segments.reduce((s, sg) => s + sg.count, 0);
+  destLayer.mixed = destLayer.segments.length > 1;
+
+  // Activate manual mode display on target pallet so sub-rows render
+  toMM.enabled = true;
+
+  rerenderPalletCard(fromPalletIdx);
+  rerenderPalletCard(toPalletIdx);
 }
 
 // ─────────────────────────────────────────────────────────────────────
