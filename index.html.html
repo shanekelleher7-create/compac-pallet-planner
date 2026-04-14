@@ -332,6 +332,32 @@
   .fw-bold { font-weight: 700; }
   .mt-8 { margin-top: 8px; }
   .mt-16 { margin-top: 16px; }
+
+  /* FIX 1: SVG layer tooltip */
+  #svg-viz-tooltip {
+    position: fixed; display: none;
+    background: #333; color: #fff; font-size: 12px;
+    padding: 6px; border-radius: 4px;
+    pointer-events: none; z-index: 9999;
+    max-width: 240px; line-height: 1.5;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  }
+
+  /* FIX 2: Segment sub-rows in manual mode */
+  .layer-table tr.seg-row td {
+    background: #F8F8FF; padding: 3px 8px 3px 26px;
+    font-size: 11px; border-bottom: 1px solid #EBEBF0;
+  }
+  .layer-table tr.seg-row:last-child td { border-bottom: none; }
+  .layer-table tr.drag-over-seg > td {
+    border-top: 2px solid var(--green) !important;
+    background: #D1FAE5 !important;
+  }
+  .seg-drag-handle {
+    color: var(--gray-300); font-size: 12px; cursor: grab;
+    user-select: none; padding: 0 3px; letter-spacing: -1px;
+  }
+  .seg-drag-handle:active { cursor: grabbing; }
 </style>
 </head>
 <body>
@@ -529,6 +555,9 @@
 
 </div><!-- /main -->
 
+<!-- FIX 1: floating SVG layer tooltip -->
+<div id="svg-viz-tooltip"></div>
+
 <script>
 // ─────────────────────────────────────────────────────────────────────
 // CONSTANTS & STATE
@@ -545,7 +574,7 @@ let lastResult = null;
 // Manual (Tetris) mode state per pallet
 // { [palletIdx]: { enabled: bool, layers: [...], original: [...] } }
 let manualModes = {};
-let dragState = { fromPalletIdx: null, fromLayerIdx: null };
+let dragState = { fromPalletIdx: null, fromLayerIdx: null, fromSegIdx: null, dragType: null };
 
 // ─────────────────────────────────────────────────────────────────────
 // INITIALIZATION
@@ -1090,6 +1119,7 @@ function renderPallets(pallets, settings, skus) {
   ).join('');
 
   document.getElementById('palletResultsSection').style.display = '';
+  initVizTooltips(); // FIX 1: wire SVG tooltips after full render
 }
 
 function rerenderPalletCard(palletIdx) {
@@ -1101,6 +1131,7 @@ function rerenderPalletCard(palletIdx) {
   if (!existing) return;
   const newCard = createPalletCard(pallet, palletIdx + 1, settings, palletIdx);
   existing.replaceWith(newCard);
+  initVizTooltips(); // FIX 1: re-wire SVG tooltips after card rerender
 }
 
 function createPalletCard(pallet, num, settings, palletIdx) {
@@ -1218,6 +1249,25 @@ function buildLayerTableHTML(layers, palletIdx, isManual) {
       <td style="font-size:11px;white-space:nowrap;">${fmtNum(layer.heightIn,1)}"</td>
       <td>${chips}</td>
     </tr>`;
+
+    // FIX 2: segment sub-rows for box-level drag in manual mode
+    if (isManual && layer.segments && layer.segments.length > 0) {
+      layer.segments.forEach((seg, si) => {
+        layerRows += `<tr class="seg-row"
+          draggable="true"
+          ondragstart="onSegDragStart(event,${palletIdx},${li},${si})"
+          ondragover="event.stopPropagation();event.preventDefault();"
+          ondragleave="onLayerDragLeave(event)"
+          ondrop="event.stopPropagation();"
+          ondragend="onLayerDragEnd(event)">
+          <td><span class="seg-drag-handle" title="Drag to move to another layer">&#8942;&#8942;</span></td>
+          <td colspan="3">
+            <span class="layer-sku-chip" style="background:${seg.color};">${esc(seg.sku)} ×${seg.count}</span>
+            <span style="font-size:10px;color:var(--gray-500);margin-left:4px;">drag to layer</span>
+          </td>
+        </tr>`;
+      });
+    }
   });
 
   const extraTh = isManual ? '<th style="width:22px;"></th>' : '';
@@ -1411,6 +1461,8 @@ function resetManualMode(palletIdx) {
 function onLayerDragStart(e, palletIdx, layerIdx) {
   dragState.fromPalletIdx = palletIdx;
   dragState.fromLayerIdx = layerIdx;
+  dragState.fromSegIdx = null;
+  dragState.dragType = 'layer';
   e.dataTransfer.effectAllowed = 'move';
   e.currentTarget.classList.add('dragging');
 }
@@ -1419,17 +1471,30 @@ function onLayerDragOver(e, palletIdx, layerIdx) {
   if (dragState.fromPalletIdx !== palletIdx) return;
   e.preventDefault();
   e.dataTransfer.dropEffect = 'move';
-  e.currentTarget.classList.add('drag-over');
+  // FIX 2: different highlight colour for segment-onto-layer drops
+  if (dragState.dragType === 'segment') {
+    e.currentTarget.classList.add('drag-over-seg');
+  } else {
+    e.currentTarget.classList.add('drag-over');
+  }
 }
 
 function onLayerDragLeave(e) {
-  e.currentTarget.classList.remove('drag-over');
+  e.currentTarget.classList.remove('drag-over', 'drag-over-seg');
 }
 
 function onLayerDrop(e, palletIdx, layerIdx) {
   e.preventDefault();
-  e.currentTarget.classList.remove('drag-over');
+  e.currentTarget.classList.remove('drag-over', 'drag-over-seg');
   if (dragState.fromPalletIdx !== palletIdx) return;
+
+  // FIX 2: route to segment-drop handler when dragging a segment
+  if (dragState.dragType === 'segment') {
+    onSegDrop(palletIdx, dragState.fromLayerIdx, dragState.fromSegIdx, layerIdx);
+    return;
+  }
+
+  // Existing layer-reorder logic (unchanged)
   const from = dragState.fromLayerIdx;
   const to = layerIdx;
   if (from === to) return;
@@ -1442,9 +1507,109 @@ function onLayerDrop(e, palletIdx, layerIdx) {
 
 function onLayerDragEnd(e) {
   document.querySelectorAll('.layer-table tr').forEach(tr => {
-    tr.classList.remove('dragging', 'drag-over');
+    tr.classList.remove('dragging', 'drag-over', 'drag-over-seg');
   });
-  dragState = { fromPalletIdx: null, fromLayerIdx: null };
+  dragState = { fromPalletIdx: null, fromLayerIdx: null, fromSegIdx: null, dragType: null };
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// FIX 2: SEGMENT (BOX-LEVEL) DRAG — new functions, layer drag untouched
+// ─────────────────────────────────────────────────────────────────────
+function onSegDragStart(e, palletIdx, layerIdx, segIdx) {
+  dragState.fromPalletIdx = palletIdx;
+  dragState.fromLayerIdx  = layerIdx;
+  dragState.fromSegIdx    = segIdx;
+  dragState.dragType      = 'segment';
+  e.dataTransfer.effectAllowed = 'move';
+  e.stopPropagation(); // prevent parent layer-row drag from also firing
+  e.currentTarget.classList.add('dragging');
+}
+
+function onSegDrop(palletIdx, fromLayerIdx, fromSegIdx, toLayerIdx) {
+  if (fromLayerIdx === toLayerIdx) return;
+  const mm = manualModes[palletIdx];
+  if (!mm) return;
+
+  const fromLayer = mm.layers[fromLayerIdx];
+  if (!fromLayer || !fromLayer.segments || !fromLayer.segments[fromSegIdx]) return;
+
+  const movingSeg = JSON.parse(JSON.stringify(fromLayer.segments[fromSegIdx]));
+
+  // Remove segment from source layer
+  fromLayer.segments.splice(fromSegIdx, 1);
+  fromLayer.count = fromLayer.segments.reduce((s, sg) => s + sg.count, 0);
+  fromLayer.mixed = fromLayer.segments.length > 1;
+
+  // If source layer is now empty, remove it; adjust destination index if needed
+  let destIdx = toLayerIdx;
+  if (fromLayer.segments.length === 0) {
+    mm.layers.splice(fromLayerIdx, 1);
+    if (fromLayerIdx < toLayerIdx) destIdx--;
+  }
+
+  // Add segment to destination layer
+  const destLayer = mm.layers[destIdx];
+  if (!destLayer) { rerenderPalletCard(palletIdx); return; }
+
+  const existing = destLayer.segments
+    ? destLayer.segments.find(s => s.skuIdx === movingSeg.skuIdx)
+    : null;
+  if (existing) {
+    existing.count += movingSeg.count;
+  } else {
+    if (!destLayer.segments) {
+      // Normalise layers that were built without explicit segments array
+      destLayer.segments = [{ skuIdx: destLayer.skuIdx, sku: destLayer.sku, color: destLayer.color, count: destLayer.count, bpl: 0 }];
+    }
+    destLayer.segments.push(movingSeg);
+  }
+  destLayer.count = destLayer.segments.reduce((s, sg) => s + sg.count, 0);
+  destLayer.mixed = destLayer.segments.length > 1;
+
+  rerenderPalletCard(palletIdx);
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// FIX 1: SVG LAYER TOOLTIP — wires mouseenter/move/leave onto layer rects
+// Call after any render that produces .pallet-viz SVGs.
+// Does NOT touch createPalletViz or any SVG rendering logic.
+// ─────────────────────────────────────────────────────────────────────
+function initVizTooltips() {
+  const tip = document.getElementById('svg-viz-tooltip');
+  if (!tip) return;
+
+  // Build fill-colour → {sku, desc} lookup from current result
+  const colorMap = {};
+  if (lastResult && lastResult.skuData) {
+    lastResult.skuData.forEach(sd => {
+      colorMap[sd.color.toLowerCase()] = { sku: sd.sku, desc: sd.desc };
+    });
+  }
+  if (Object.keys(colorMap).length === 0) return;
+
+  document.querySelectorAll('.pallet-viz svg rect').forEach(rect => {
+    const fill = (rect.getAttribute('fill') || '').toLowerCase();
+    const info = colorMap[fill];
+    if (!info) return; // skip background, board, outline rects
+
+    rect.style.cursor = 'crosshair';
+
+    // Remove any previously attached listeners by cloning the node
+    const fresh = rect.cloneNode(true);
+    rect.parentNode.replaceChild(fresh, rect);
+
+    fresh.addEventListener('mouseenter', () => {
+      tip.innerHTML = `<strong>${info.sku}</strong><br><span style="opacity:0.85">${info.desc}</span>`;
+      tip.style.display = 'block';
+    });
+    fresh.addEventListener('mousemove', e => {
+      tip.style.left = (e.clientX + 14) + 'px';
+      tip.style.top  = (e.clientY - 10) + 'px';
+    });
+    fresh.addEventListener('mouseleave', () => {
+      tip.style.display = 'none';
+    });
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────
