@@ -745,6 +745,22 @@ function computeBoxesPerLayerDisplay(boxL, boxW, boxH, palletL, palletW) {
 }
 
 /**
+ * Compute traditional Ti (boxes per layer) and Hi (layers high) for a box.
+ * Ti: tries both L/W footprint rotations, returns the larger count.
+ *     Uses original box L × W (flat orientation) — same as standard Ti calc.
+ * Hi: floor(stackLimit / rawH) using original box standing height.
+ * Returns { ti, hi, product }
+ */
+function computeTiHi(rawL, rawW, rawH, palletL, palletW, stackLimit) {
+  const ti = Math.max(
+    Math.floor(palletL / rawL) * Math.floor(palletW / rawW),
+    Math.floor(palletL / rawW) * Math.floor(palletW / rawL)
+  );
+  const hi = rawH > 0 ? Math.floor(stackLimit / rawH) : 0;
+  return { ti, hi, product: ti * hi };
+}
+
+/**
  * NMFC freight class lookup by density (lbs/cu ft)
  */
 function getFreightClass(density) {
@@ -1154,11 +1170,39 @@ function createPalletCard(pallet, num, settings, palletIdx) {
   const isManual = mm && mm.enabled;
   const debugOn = document.getElementById('debugMode').checked;
 
+  // Ti/Hi summary — dominant SKU (most boxes) across all display layers
+  let tihiSummaryHTML = '';
+  if (lastResult && lastResult.skuData) {
+    const skuCounts = {};
+    displayLayers.forEach(layer => {
+      (layer.segments || [{ skuIdx: layer.skuIdx, count: layer.count }]).forEach(seg => {
+        skuCounts[seg.skuIdx] = (skuCounts[seg.skuIdx] || 0) + seg.count;
+      });
+    });
+    const domIdx = Object.keys(skuCounts).reduce((a, b) =>
+      (skuCounts[a] || 0) >= (skuCounts[b] || 0) ? a : b, null);
+    const domSku = domIdx !== null
+      ? lastResult.skuData.find(sd => sd.idx === parseInt(domIdx))
+      : null;
+    if (domSku) {
+      const stackLimit = settings.maxHeight - settings.palletBoardH;
+      const { ti, hi, product } = computeTiHi(
+        domSku.rawL, domSku.rawW, domSku.rawH,
+        settings.palletL, settings.palletW, stackLimit
+      );
+      tihiSummaryHTML = ` <span style="color:#7BAFD4;margin-left:6px;">|</span>
+        Ti:&nbsp;${ti} &nbsp;Hi:&nbsp;${hi}
+        &nbsp;<span title="Ti = boxes per layer, Hi = layers high, Ti×Hi = max boxes on a single pallet"
+          style="cursor:help;border-bottom:1px dotted #7BAFD4;">Ti×Hi:&nbsp;${product}</span>
+        <span style="font-size:9px;color:#6A8BAD;margin-left:3px;">(${esc(domSku.sku)})</span>`;
+    }
+  }
+
   // Header
   let headerHTML = `<div class="pallet-card-header">
     <div class="pallet-info">
       <div class="pallet-num">Pallet ${num}${isManual ? ' <span style="font-size:11px;color:#C4B5FD;">[MANUAL]</span>' : ''}</div>
-      <div class="pallet-ht ${displayOverH ? 'over' : ''}">${fmtNum(displayReportedH,1)}" total (${fmtNum(displayTotalH,1)}" boxes + ${settings.palletBoardH}" board) / ${settings.maxHeight}"</div>
+      <div class="pallet-ht ${displayOverH ? 'over' : ''}">${fmtNum(displayReportedH,1)}" total (${fmtNum(displayTotalH,1)}" boxes + ${settings.palletBoardH}" board) / ${settings.maxHeight}"${tihiSummaryHTML}</div>
     </div>
     <div class="pallet-card-actions">
       ${displayOverH ? '<span class="warn-badge">&#9888; HEIGHT</span>' : '<span style="font-size:16px;color:#6EE7B7;">&#10003;</span>'}
@@ -1247,10 +1291,32 @@ function buildLayerTableHTML(layers, palletIdx, isManual) {
       ? `<td><span class="drag-handle" title="Drag to reorder">&#8801;</span></td>`
       : '';
 
+    // Ti/Hi for this layer — use dominant segment's raw dims
+    let tihiCell = '<td></td>';
+    if (lastResult && lastResult.skuData && lastResult.settings) {
+      const segs = layer.segments || [{ skuIdx: layer.skuIdx, count: layer.count }];
+      const domSeg = segs.reduce((a, b) => (b.count > a.count ? b : a), segs[0]);
+      const domSku = lastResult.skuData.find(sd => sd.idx === domSeg.skuIdx);
+      if (domSku) {
+        const sl = lastResult.settings.maxHeight - lastResult.settings.palletBoardH;
+        const { ti, hi, product } = computeTiHi(
+          domSku.rawL, domSku.rawW, domSku.rawH,
+          lastResult.settings.palletL, lastResult.settings.palletW, sl
+        );
+        tihiCell = `<td style="white-space:nowrap;font-size:10px;color:#7BAFD4;"
+          title="Ti = boxes per layer, Hi = layers high, Ti×Hi = max boxes on one pallet (${esc(domSku.sku)})">
+          <span style="display:inline-block;">Ti&nbsp;${ti}</span>
+          <span style="display:inline-block;margin-left:3px;">Hi&nbsp;${hi}</span>
+          <span style="display:inline-block;margin-left:3px;font-weight:600;">×${product}</span>
+        </td>`;
+      }
+    }
+
     layerRows += `<tr ${dragAttrs}>
       ${handleCell}
       <td style="color:var(--gray-500);font-size:11px;white-space:nowrap;">L${li+1}</td>
       <td style="font-size:11px;white-space:nowrap;">${fmtNum(layer.heightIn,1)}"</td>
+      ${tihiCell}
       <td>${chips}</td>
     </tr>`;
 
@@ -1277,7 +1343,7 @@ function buildLayerTableHTML(layers, palletIdx, isManual) {
   const extraTh = isManual ? '<th style="width:22px;"></th>' : '';
   return `<div class="layer-table-wrap">
     <table class="layer-table">
-      <thead><tr>${extraTh}<th>Lyr</th><th>Ht</th><th>Contents</th></tr></thead>
+      <thead><tr>${extraTh}<th>Lyr</th><th>Ht</th><th title="Ti = boxes per layer, Hi = layers high, Ti×Hi = max boxes on one pallet">Ti·Hi</th><th>Contents</th></tr></thead>
       <tbody>${layerRows}</tbody>
     </table>
   </div>`;
