@@ -2059,10 +2059,18 @@ function printBuildSheet() {
     const density = vol > 0 ? pallet.totalWeight / vol : 0;
     const fc = getFreightClass(density);
 
+    // SVG viz — call the existing createPalletViz directly
+    const vizPallet = { ...pallet, layers, totalHeight: boxH, reportedHeight: totalH, overHeight: overH };
+    const vizSVG = createPalletViz(vizPallet, settings);
+
     let layerRows = '';
     layers.forEach((layer, li) => {
-      const segs = layer.segments || [{ skuIdx: layer.skuIdx, sku: layer.sku, count: layer.count }];
-      const contents = segs.map(s => `${esc(s.sku)} ×${s.count}`).join(', ');
+      // Include color in single-seg fallback so chips render correctly
+      const segs = layer.segments || [{ skuIdx: layer.skuIdx, sku: layer.sku, count: layer.count, color: layer.color }];
+      // Colored chip pills matching SKU_COLORS
+      const contents = segs.map(s =>
+        `<span style="display:inline-block;background:${s.color};color:#fff;border-radius:10px;padding:1px 8px;font-size:11px;font-weight:600;margin:1px 2px;white-space:nowrap;">${esc(s.sku)} ×${s.count}</span>`
+      ).join('');
       const domSeg = segs.reduce((a, b) => (b.count > a.count ? b : a), segs[0]);
       const domSd = skuData.find(sd => sd.idx === domSeg.skuIdx);
       let tiCell = '—';
@@ -2071,9 +2079,9 @@ function printBuildSheet() {
         tiCell = `Ti ${ti} × Hi ${hi} = <b>${tihi}</b>`;
       }
       layerRows += `<tr>
-        <td style="color:#666;">L${li + 1}</td>
-        <td style="text-align:center;">${fmtNum(layer.heightIn, 1)}"</td>
-        <td>${tiCell}</td>
+        <td style="color:#666;white-space:nowrap;">L${li + 1}</td>
+        <td style="text-align:center;white-space:nowrap;">${fmtNum(layer.heightIn, 1)}"</td>
+        <td style="white-space:nowrap;">${tiCell}</td>
         <td>${contents}</td>
       </tr>`;
     });
@@ -2089,23 +2097,30 @@ function printBuildSheet() {
             &nbsp;|&nbsp; Freight Class: ${fc}
           </span>
         </div>
-        <table style="width:100%;border-collapse:collapse;font-size:12px;">
-          <thead>
-            <tr style="background:#f3f4f6;">
-              <th style="padding:5px 10px;text-align:left;border-bottom:1px solid #e5e7eb;">Lyr</th>
-              <th style="padding:5px 10px;text-align:center;border-bottom:1px solid #e5e7eb;">Ht</th>
-              <th style="padding:5px 10px;text-align:left;border-bottom:1px solid #e5e7eb;white-space:nowrap;">Ti × Hi</th>
-              <th style="padding:5px 10px;text-align:left;border-bottom:1px solid #e5e7eb;">Contents</th>
-            </tr>
-          </thead>
-          <tbody>${layerRows}</tbody>
-          <tfoot>
-            <tr style="background:#f9fafb;font-weight:700;">
-              <td colspan="2" style="padding:5px 10px;border-top:1px solid #e5e7eb;">Total</td>
-              <td colspan="2" style="padding:5px 10px;border-top:1px solid #e5e7eb;">${layers.length} layers — ${fmtNum(totalH,1)}" total (${fmtNum(boxH,1)}" boxes + ${settings.palletBoardH}" board)</td>
-            </tr>
-          </tfoot>
-        </table>
+        <div style="display:flex;align-items:flex-start;">
+          <div style="flex-shrink:0;padding:10px 6px 10px 10px;background:#f9fafb;border-right:1px solid #e5e7eb;">
+            ${vizSVG}
+          </div>
+          <div style="flex:1;min-width:0;">
+            <table style="width:100%;border-collapse:collapse;font-size:12px;">
+              <thead>
+                <tr style="background:#f3f4f6;">
+                  <th style="padding:5px 8px;text-align:left;border-bottom:1px solid #e5e7eb;">Lyr</th>
+                  <th style="padding:5px 8px;text-align:center;border-bottom:1px solid #e5e7eb;">Ht</th>
+                  <th style="padding:5px 8px;text-align:left;border-bottom:1px solid #e5e7eb;white-space:nowrap;">Ti × Hi</th>
+                  <th style="padding:5px 8px;text-align:left;border-bottom:1px solid #e5e7eb;">Contents</th>
+                </tr>
+              </thead>
+              <tbody>${layerRows}</tbody>
+              <tfoot>
+                <tr style="background:#f9fafb;font-weight:700;">
+                  <td colspan="2" style="padding:5px 8px;border-top:1px solid #e5e7eb;">Total</td>
+                  <td colspan="2" style="padding:5px 8px;border-top:1px solid #e5e7eb;">${layers.length} layers — ${fmtNum(totalH,1)}" total (${fmtNum(boxH,1)}" boxes + ${settings.palletBoardH}" board)</td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
       </div>`;
   });
 
@@ -2115,7 +2130,7 @@ function printBuildSheet() {
 <meta charset="utf-8">
 <title>Compac Industries — Pallet Build Sheet</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
   body { font-family: Arial, sans-serif; font-size: 13px; color: #111; background: #fff; padding: 24px; }
   h1 { font-size: 20px; color: #1E3A5F; }
   h2 { font-size: 14px; color: #1E3A5F; margin: 20px 0 8px; border-bottom: 2px solid #1E3A5F; padding-bottom: 4px; }
