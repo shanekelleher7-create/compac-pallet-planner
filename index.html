@@ -377,6 +377,7 @@
     <button class="btn btn-secondary btn-sm" onclick="loadSampleData()">&#9654; Sample Data</button>
     <button class="btn btn-secondary btn-sm" onclick="clearAll()">&#10005; Clear</button>
     <button class="btn btn-secondary btn-sm" onclick="window.print()">&#128438; Print</button>
+    <button class="btn btn-secondary btn-sm" onclick="printBuildSheet()" id="btnBuildSheet" style="display:none;">&#128196; Build Sheet PDF</button>
     <button class="btn btn-primary" onclick="runOptimizer()">&#9654;&#9654; Optimize Pallets</button>
   </div>
 </header>
@@ -1073,7 +1074,9 @@ function renderSKUSummary(skus, settings, pallets) {
     <thead><tr>
       <th>Color</th><th>SKU</th><th>Description</th>
       <th class="num">L×W×H (in)</th>
-      <th class="num">Best BPL</th>
+      <th class="num" title="Ti = max boxes that fit on one pallet layer (flat orientation, best rotation)">Ti</th>
+      <th class="num" title="Hi = layers high = usable stack height ÷ box height">Hi</th>
+      <th class="num" title="Ti × Hi = theoretical max boxes on one full pallet">Ti×Hi</th>
       <th class="num">Orient Used</th>
       <th class="num">Qty (ctns)</th>
       <th class="num">Sell Price</th>
@@ -1090,9 +1093,11 @@ function renderSKUSummary(skus, settings, pallets) {
 
   skus.forEach((s, i) => {
     const color = SKU_COLORS[i % SKU_COLORS.length];
-    const bpl = computeBoxesPerLayerDisplay(s.l, s.w, s.h, settings.palletL, settings.palletW);
     const sd = skuDataMap[s.sku];
     const orientLabel = sd ? sd.orientLabel : '—';
+    const stackLimit = settings.maxHeight - settings.palletBoardH;
+    const { ti, hi, product: tihi } = computeTiHi(s.l, s.w, s.h, settings.palletL, settings.palletW, stackLimit);
+    const oversized = ti === 0;
     const totalSell = s.qty * s.units * s.sell;
     const totalCogs = s.qty * s.units * s.cost;
     html += `<tr>
@@ -1100,7 +1105,9 @@ function renderSKUSummary(skus, settings, pallets) {
       <td class="fw-bold">${esc(s.sku)}</td>
       <td>${esc(s.desc)}</td>
       <td class="num">${s.l}×${s.w}×${s.h}</td>
-      <td class="num">${bpl > 0 ? bpl : '<span style="color:var(--red)">⚠ Oversized</span>'}</td>
+      <td class="num">${oversized ? '<span style="color:var(--red)">⚠ Oversized</span>' : ti}</td>
+      <td class="num">${oversized ? '—' : hi}</td>
+      <td class="num" style="font-weight:700;color:var(--navy);">${oversized ? '—' : tihi}</td>
       <td class="num" style="font-size:11px;color:var(--gray-500);">${esc(orientLabel)}</td>
       <td class="num">${s.qty}</td>
       <td class="num">$${fmtNum(s.sell,2)}</td>
@@ -1191,9 +1198,10 @@ function createPalletCard(pallet, num, settings, palletIdx) {
         settings.palletL, settings.palletW, stackLimit
       );
       tihiSummaryHTML = ` <span style="color:#7BAFD4;margin-left:6px;">|</span>
-        Ti:&nbsp;${ti} &nbsp;Hi:&nbsp;${hi}
-        &nbsp;<span title="Ti = boxes per layer, Hi = layers high, Ti×Hi = max boxes on a single pallet"
-          style="cursor:help;border-bottom:1px dotted #7BAFD4;">Ti×Hi:&nbsp;${product}</span>
+        <span title="Ti = ${ti} boxes per layer, Hi = ${hi} layers high, Ti×Hi = ${product} max boxes on one pallet (${esc(domSku.sku)})"
+          style="cursor:help;">
+          Ti&nbsp;<b>${ti}</b>&nbsp;×&nbsp;Hi&nbsp;<b>${hi}</b>&nbsp;=&nbsp;<b style="color:#6EE7B7;">${product}</b>
+        </span>
         <span style="font-size:9px;color:#6A8BAD;margin-left:3px;">(${esc(domSku.sku)})</span>`;
     }
   }
@@ -1217,8 +1225,8 @@ function createPalletCard(pallet, num, settings, palletIdx) {
   let statsHTML = `<div class="pallet-stats">
     <div class="pallet-stat">
       <div class="ps-label">Height</div>
-      <div class="ps-value" style="color:${displayOverH?'var(--red)':'var(--navy)'};">${fmtNum(displayTotalH,1)}</div>
-      <div class="ps-unit">inches</div>
+      <div class="ps-value" style="color:${displayOverH?'var(--red)':'var(--navy)'};">${fmtNum(displayReportedH,1)}</div>
+      <div class="ps-unit">in total (incl. board)</div>
     </div>
     <div class="pallet-stat">
       <div class="ps-label">Weight</div>
@@ -1882,6 +1890,7 @@ function runOptimizer() {
   renderStatsBar(result.pallets, skus);
   renderSKUSummary(skus, settings, result.pallets);
   renderPallets(result.pallets, settings, skus);
+  document.getElementById('btnBuildSheet').style.display = '';
   renderFinancials(skus, settings, result.pallets);
   CARRIERS.forEach((_, i) => updateCarrierCalc(i));
 
@@ -1999,6 +2008,175 @@ function loadSampleData() {
   samples.forEach(s => addSKURow(s));
 }
 
+// ─────────────────────────────────────────────────────────────────────
+// BUILD SHEET PDF
+// ─────────────────────────────────────────────────────────────────────
+function printBuildSheet() {
+  if (!lastResult) return;
+  const { pallets, skuData } = lastResult;
+  const settings = getSettings();
+  const skus = Array.from(document.querySelectorAll('#skuTbody tr')).map(row => {
+    const inputs = row.querySelectorAll('input');
+    return {
+      sku:   inputs[0]?.value || '',
+      desc:  inputs[1]?.value || '',
+      l: parseFloat(inputs[2]?.value) || 0,
+      w: parseFloat(inputs[3]?.value) || 0,
+      h: parseFloat(inputs[4]?.value) || 0,
+      wt: parseFloat(inputs[5]?.value) || 0,
+      qty: parseInt(inputs[6]?.value)  || 0,
+    };
+  }).filter(s => s.sku);
+  const stackLimit = settings.maxHeight - settings.palletBoardH;
+  const today = new Date().toLocaleDateString('en-US', { year:'numeric', month:'long', day:'numeric' });
+
+  // ── SKU summary rows ──────────────────────────────────────────────
+  let skuRows = '';
+  skus.forEach((s, i) => {
+    const { ti, hi, product: tihi } = computeTiHi(s.l, s.w, s.h, settings.palletL, settings.palletW, stackLimit);
+    const color = SKU_COLORS[i % SKU_COLORS.length];
+    skuRows += `<tr>
+      <td><span style="display:inline-block;width:10px;height:10px;border-radius:50%;background:${color};margin-right:4px;"></span>${esc(s.sku)}</td>
+      <td>${esc(s.desc)}</td>
+      <td style="text-align:center;">${s.l}×${s.w}×${s.h}</td>
+      <td style="text-align:center;">${s.wt > 0 ? s.wt + ' lbs' : '—'}</td>
+      <td style="text-align:center;">${ti > 0 ? ti : '⚠'}</td>
+      <td style="text-align:center;">${ti > 0 ? hi : '—'}</td>
+      <td style="text-align:center;font-weight:700;">${ti > 0 ? tihi : '—'}</td>
+      <td style="text-align:center;">${s.qty}</td>
+    </tr>`;
+  });
+
+  // ── Per-pallet sections ───────────────────────────────────────────
+  let palletSections = '';
+  pallets.forEach((pallet, pi) => {
+    const mm = manualModes[pi];
+    const layers = (mm && mm.enabled) ? mm.layers : pallet.layers;
+    const boxH = layers.reduce((s, l) => s + l.heightIn, 0);
+    const totalH = boxH + settings.palletBoardH;
+    const overH = totalH > settings.maxHeight;
+    const vol = settings.palletL * settings.palletW * boxH / 1728;
+    const density = vol > 0 ? pallet.totalWeight / vol : 0;
+    const fc = getFreightClass(density);
+
+    let layerRows = '';
+    layers.forEach((layer, li) => {
+      const segs = layer.segments || [{ skuIdx: layer.skuIdx, sku: layer.sku, count: layer.count }];
+      const contents = segs.map(s => `${esc(s.sku)} ×${s.count}`).join(', ');
+      const domSeg = segs.reduce((a, b) => (b.count > a.count ? b : a), segs[0]);
+      const domSd = skuData.find(sd => sd.idx === domSeg.skuIdx);
+      let tiCell = '—';
+      if (domSd) {
+        const { ti, hi, product: tihi } = computeTiHi(domSd.rawL, domSd.rawW, domSd.rawH, settings.palletL, settings.palletW, stackLimit);
+        tiCell = `Ti ${ti} × Hi ${hi} = <b>${tihi}</b>`;
+      }
+      layerRows += `<tr>
+        <td style="color:#666;">L${li + 1}</td>
+        <td style="text-align:center;">${fmtNum(layer.heightIn, 1)}"</td>
+        <td>${tiCell}</td>
+        <td>${contents}</td>
+      </tr>`;
+    });
+
+    const warnStyle = overH ? 'color:#dc2626;font-weight:700;' : '';
+    palletSections += `
+      <div class="pallet-section" style="break-inside:avoid;margin-bottom:24px;border:1px solid #d1d5db;border-radius:6px;overflow:hidden;">
+        <div style="background:#1E3A5F;color:#fff;padding:8px 14px;display:flex;justify-content:space-between;align-items:center;">
+          <span style="font-size:14px;font-weight:700;">Pallet ${pi + 1}</span>
+          <span style="font-size:12px;">
+            Height: <span style="${warnStyle}">${fmtNum(totalH,1)}"${overH?' ⚠ OVER':''}</span>
+            &nbsp;|&nbsp; Weight: ${fmtNum(pallet.totalWeight, 0)} lbs
+            &nbsp;|&nbsp; Freight Class: ${fc}
+          </span>
+        </div>
+        <table style="width:100%;border-collapse:collapse;font-size:12px;">
+          <thead>
+            <tr style="background:#f3f4f6;">
+              <th style="padding:5px 10px;text-align:left;border-bottom:1px solid #e5e7eb;">Lyr</th>
+              <th style="padding:5px 10px;text-align:center;border-bottom:1px solid #e5e7eb;">Ht</th>
+              <th style="padding:5px 10px;text-align:left;border-bottom:1px solid #e5e7eb;white-space:nowrap;">Ti × Hi</th>
+              <th style="padding:5px 10px;text-align:left;border-bottom:1px solid #e5e7eb;">Contents</th>
+            </tr>
+          </thead>
+          <tbody>${layerRows}</tbody>
+          <tfoot>
+            <tr style="background:#f9fafb;font-weight:700;">
+              <td colspan="2" style="padding:5px 10px;border-top:1px solid #e5e7eb;">Total</td>
+              <td colspan="2" style="padding:5px 10px;border-top:1px solid #e5e7eb;">${layers.length} layers — ${fmtNum(totalH,1)}" total (${fmtNum(boxH,1)}" boxes + ${settings.palletBoardH}" board)</td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>`;
+  });
+
+  const html = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Compac Industries — Pallet Build Sheet</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; font-size: 13px; color: #111; background: #fff; padding: 24px; }
+  h1 { font-size: 20px; color: #1E3A5F; }
+  h2 { font-size: 14px; color: #1E3A5F; margin: 20px 0 8px; border-bottom: 2px solid #1E3A5F; padding-bottom: 4px; }
+  .meta { font-size: 12px; color: #6b7280; margin-top: 4px; }
+  table { width: 100%; border-collapse: collapse; font-size: 12px; }
+  th { background: #1E3A5F; color: #fff; padding: 6px 10px; text-align: left; }
+  th[style*="center"] { text-align: center; }
+  td { padding: 5px 10px; border-bottom: 1px solid #e5e7eb; }
+  tr:last-child td { border-bottom: none; }
+  tr:nth-child(even) td { background: #f9fafb; }
+  @media print {
+    body { padding: 0; }
+    @page { margin: 15mm; size: letter; }
+    .no-print { display: none !important; }
+  }
+</style>
+</head>
+<body>
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;">
+    <div>
+      <h1>Compac Industries — Pallet Build Sheet</h1>
+      <div class="meta">Generated: ${today} &nbsp;|&nbsp; Pallet: ${settings.palletL}"×${settings.palletW}" &nbsp;|&nbsp; Max height: ${settings.maxHeight}" (${stackLimit}" usable) &nbsp;|&nbsp; Board: ${settings.palletBoardH}"</div>
+    </div>
+    <button class="no-print" onclick="window.print()" style="padding:8px 16px;background:#1E3A5F;color:#fff;border:none;border-radius:4px;cursor:pointer;font-size:13px;">
+      &#128424; Save as PDF
+    </button>
+  </div>
+
+  <h2>SKU Summary</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>SKU</th>
+        <th>Description</th>
+        <th style="text-align:center;">L×W×H (in)</th>
+        <th style="text-align:center;">Box Wt</th>
+        <th style="text-align:center;" title="Boxes per pallet layer">Ti</th>
+        <th style="text-align:center;" title="Layers high">Hi</th>
+        <th style="text-align:center;" title="Max boxes on one pallet">Ti×Hi</th>
+        <th style="text-align:center;">Qty (ctns)</th>
+      </tr>
+    </thead>
+    <tbody>${skuRows}</tbody>
+  </table>
+
+  <h2>Pallet Build Plan — ${pallets.length} Pallet${pallets.length !== 1 ? 's' : ''}</h2>
+  ${palletSections}
+
+  <div style="margin-top:20px;font-size:11px;color:#9ca3af;border-top:1px solid #e5e7eb;padding-top:8px;">
+    Ti = boxes per pallet layer (flat footprint, best rotation) &nbsp;|&nbsp; Hi = layers high (usable height ÷ box height) &nbsp;|&nbsp; Ti×Hi = max boxes per full pallet
+  </div>
+</body>
+</html>`;
+
+  const w = window.open('', '_blank', 'width=900,height=700');
+  w.document.write(html);
+  w.document.close();
+  w.focus();
+  setTimeout(() => w.print(), 400);
+}
+
 function clearAll() {
   document.getElementById('skuTbody').innerHTML = '';
   skuRowCount = 0;
@@ -2009,6 +2187,7 @@ function clearAll() {
   document.getElementById('palletResultsSection').style.display = 'none';
   document.getElementById('skuSummarySection').style.display = 'none';
   document.getElementById('financialsSection').style.display = 'none';
+  document.getElementById('btnBuildSheet').style.display = 'none';
   ['st-pallets','st-warnings','st-weight','st-volume','st-skus'].forEach(id => {
     document.getElementById(id).textContent = '—';
   });
